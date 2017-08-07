@@ -11,7 +11,6 @@ import {
   Row,
   Table} from 'react-bootstrap';
 
-import ForgetIdpButton from './ForgetIdpButton';
 import ForgetIdpModal from './ForgetIdpModal';
 
 export class IdpHistory extends React.Component {
