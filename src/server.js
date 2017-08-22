@@ -37,7 +37,16 @@ app.use(config.graphql.path, graphQLHTTP(request => {
     deviceId = request.headers.cookie;
   }
 
+  let adminToken = null;
+
+  if (request.cookies && request.cookies.adminToken) {
+    adminToken = "Token " + request.cookies.adminToken;
+  } else {
+    adminToken = request.headers.authorization;
+  }
+
   request.session.deviceId = deviceId;
+  request.session.adminToken = adminToken;
 
   return {
     schema: schema,
@@ -88,7 +97,13 @@ app.use(webpackMiddleware(webpack(webpackConfig), {
 app.use(async (req, res) => {
   var deviceId = req.cookies.deviceId;
 
-  const fetcher = new ServerFetcher(GRAPHQL_URL, deviceId);
+  var adminToken = null;
+
+  if (req.cookies.adminToken) {
+    adminToken = "Token " + req.cookies.adminToken;
+  }
+
+  const fetcher = new ServerFetcher(GRAPHQL_URL, deviceId, adminToken);
 
   const { redirect, status, element } = await getFarceResult({
     url: req.url,

@@ -1,3 +1,20 @@
+input AdminLoginInput {
+  email: String!
+  password: String!
+  clientMutationId: String
+}
+
+type AdminLoginPayload {
+  token: AuthorizationTokenType
+  clientMutationId: String
+}
+
+type AuthorizationTokenType {
+  type: String
+  value: String
+  validUntil: Date
+}
+
 input CreatePublisherInput {
   publisherName: String!
   publisherCode: String!
@@ -106,6 +123,7 @@ type Mutation {
   createPublisherRegistration(input: CreatePublisherRegistrationInput!): CreatePublisherRegistrationPayload
   createPublisher(input: CreatePublisherInput!): CreatePublisherPayload
   denyPublisherRegistration(input: DenyPublisherRegistrationInput!): DenyPublisherRegistrationPayload
+  adminLogin(input: AdminLoginInput!): AdminLoginPayload
 }
 
 type PublisherRegistrationType {
@@ -149,6 +167,7 @@ type UserType {
 
 type viewer {
   viewerId: String
+  me: UserType
   device(globalId: String): DeviceType
   identityProvider(id: Int): IdentityProviderType
   publisher(id: String): PublisherType

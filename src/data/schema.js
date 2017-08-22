@@ -24,6 +24,7 @@ import {
 
 import {
     fetchActivity,
+    fetchMe,
     fetchDevice,
     fetchIdentityProvider,
     fetchPublisher,
@@ -40,7 +41,8 @@ import {
     fetchApprovedRegistrations,
     fetchDeniedRegistrations,
     getAdminViewer,
-    denyPublisherRegistration
+    denyPublisherRegistration,
+    adminLogin
 } from './database';
 
 import {
@@ -274,6 +276,21 @@ var PublisherRegistrationType = new GraphQLObjectType({
     })
 });
 
+var AuthorizationTokenType = new GraphQLObjectType({
+    name: 'AuthorizationTokenType',
+    fields: () => ({
+        type: {
+            type: GraphQLString
+        },
+        value: {
+            type: GraphQLString
+        },
+        validUntil: {
+            type: DateType
+        }
+    })
+});
+
 var IdentityProviderType = new GraphQLObjectType({
     name: 'IdentityProviderType',
     fields: () => ({
@@ -295,13 +312,16 @@ var IdentityProviderType = new GraphQLObjectType({
     })
 });
 
-
 // The root provides a resolver function for each API endpoint
 const ViewerType = new GraphQLObjectType({
     name: 'viewer',
     fields: {
         viewerId: {
             type: GraphQLString
+        },
+        me: {
+            type: UserType,
+            resolve: (root, args) => fetchMe(root.adminToken)
         },
         device: {
             type: DeviceType,
@@ -394,6 +414,31 @@ const denyPublisherRegistrationMutation = mutationWithClientMutationId({
     }
 });
 
+const adminLoginMutation = mutationWithClientMutationId({
+    name: 'AdminLogin',
+    inputFields: {
+        email: { type: new GraphQLNonNull(GraphQLString) },
+        password: { type: new GraphQLNonNull(GraphQLString) }
+    },
+
+    outputFields: {
+        token: {
+            type: AuthorizationTokenType,
+            resolve: (root, args) => root
+        }
+    },
+
+    mutateAndGetPayload: ({email, password}, root) => {
+        var loginCredentials = {
+            "emailAddress": email,
+            "password": password
+        };
+
+        return adminLogin(loginCredentials);
+    }
+});
+
+
 const createPublisherRegistrationMutation = mutationWithClientMutationId({
     name: 'CreatePublisherRegistration',
     inputFields: {
@@ -466,7 +511,8 @@ const mutationType = new GraphQLObjectType({
         forgetIdp: forgetIdpMutation,
         createPublisherRegistration: createPublisherRegistrationMutation,
         createPublisher: createPublisherMutation,
-        denyPublisherRegistration: denyPublisherRegistrationMutation
+        denyPublisherRegistration: denyPublisherRegistrationMutation,
+        adminLogin: adminLoginMutation
     })
 });
 
@@ -477,11 +523,10 @@ const queryType = new GraphQLObjectType({
         viewer: {
             type: ViewerType,
             resolve: (parentValue, args, request) => {
-                if (request.session.deviceId) {
-                    return getViewer(request.session.deviceId);
-                } else {
-                    return getViewer(null);
-                }
+                let deviceId = (request.session.deviceId)? request.session.deviceId : null;
+                let adminToken = (request.session.adminToken)? request.session.adminToken : null;
+
+                return getViewer(deviceId, adminToken);
             }
         },
         publisherRegistration: {

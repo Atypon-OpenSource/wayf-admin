@@ -7,7 +7,8 @@ import {
   graphql 
 } from 'react-relay';
 
-
+import cookie from 'react-cookies'
+import Login from './Login';
 import AdminHeader from './AdminHeader';
 import AdminTabs from './AdminTabs';
 import { 
@@ -29,6 +30,7 @@ class AdminApp extends React.Component {
     this.showCreatePublisher = this.showCreatePublisher.bind(this);
     this.hideCreatePublisherModal = this.hideCreatePublisherModal.bind(this);
     this.renderAdminAction = this.renderAdminAction.bind(this);
+    this.authorizationCheck = this.authorizationCheck.bind(this);
   }
 
   showCreatePublisher() {
@@ -49,17 +51,24 @@ class AdminApp extends React.Component {
     }
   }
 
+  authorizationCheck() {
+    if (this.props.viewer.me.adminId) {
+      return (
+          <div data-framework="relay">
+            <Grid>
+              {this.renderAdminAction()}
+              <AdminHeader createPublisher={this.showCreatePublisher} />
+              <AdminTabs relay={this.props.relay} viewer={this.props.viewer}/>
+            </Grid>
+          </div>
+        );
+    } else {
+      return (<Login relay={this.props.relay} />);
+    }
+  }
+
   render() {
-    return (
-        <div data-framework="relay">
-          <Grid>
-            {this.renderAdminAction()}
-            <AdminHeader createPublisher={this.showCreatePublisher} />
-            <AdminTabs relay={this.props.relay} viewer={this.props.viewer}/>
-          </Grid>
-        </div>
-      );
-  
+    return this.authorizationCheck();
   }
 }
 
@@ -67,7 +76,12 @@ export default createFragmentContainer(
   AdminApp,
   graphql`
     fragment AdminApp_viewer on viewer {
-        ...AdminTabs_viewer
+      me {
+        adminId: id,
+        firstName,
+        lastName
+      }
+      ...AdminTabs_viewer
     }
   `
 );

@@ -10,8 +10,9 @@ export var identityProviderLoader = new DataLoader(keys => fetchIdentityProvider
 export var userLoader = new DataLoader(keys => fetchUsers(keys));
 
 export class User {
-  constructor(secretDeviceId) {
+  constructor(secretDeviceId, adminToken) {
     this.secretDeviceId = secretDeviceId;
+    this.adminToken = adminToken;
   }
 }
 
@@ -19,13 +20,17 @@ function buildDeviceCookieHeader(deviceId) {
   return { Cookie: `deviceId=${deviceId}` };
 }
 
+function buildAuthorizationApiHeader(token) {
+  return { Authorization: `${token}` };
+}
+
 export function getAdminViewer() {
   return new User();
 }
 
-export function getViewer(deviceId) {
+export function getViewer(deviceId, adminToken) {
   console.log(`deviceId ${deviceId}`);
-  return new User(deviceId);
+  return new User(deviceId, adminToken);
 }
 
 function fetchResponseByURL(relativeURL) {
@@ -57,6 +62,10 @@ function fetchResponseByURLAndHeader(relativeURL, header) {
   console.log(relativeURL, header);
 
   return fetch(`${BASE_URL}${relativeURL}`, { headers: header }).then(res => res.json());
+}
+
+export function fetchMe(adminToken) {
+  return fetchResponseByURLAndHeader('/1/me', buildAuthorizationApiHeader(adminToken));
 }
 
 export function fetchDevice(deviceId) {
@@ -109,6 +118,9 @@ export function createPublisher(publisher) {
   return postToCloud(publisher, '/1/publisher');
 }
 
+export function adminLogin(credentials) {
+  return postToCloud(credentials, '/1/user/credentials');
+}
 
 export function fetchPendingRegistrations() {
   return fetchResponseByURL(`/1/publisherRegistrations?statuses=PENDING`);
