@@ -367,15 +367,15 @@ const ViewerType = new GraphQLObjectType({
         },
         pendingPublisherRegistrations: {
             type: new GraphQLList(PublisherRegistrationType),
-            resolve: (root, args) => fetchPendingRegistrations()
+            resolve: (root, args, request) => fetchPendingRegistrations(request.session.adminToken)
         },
         approvedPublisherRegistrations: {
             type: new GraphQLList(PublisherRegistrationType),
-            resolve: (root, args) => fetchApprovedRegistrations()
+            resolve: (root, args, request) => fetchApprovedRegistrations(request.session.adminToken)
         },
         deniedPublisherRegistrations: {
             type: new GraphQLList(PublisherRegistrationType),
-            resolve: (root, args) => fetchDeniedRegistrations()
+            resolve: (root, args, request) => fetchDeniedRegistrations(request.session.adminToken)
         }
     }
 });
@@ -409,8 +409,10 @@ const denyPublisherRegistrationMutation = mutationWithClientMutationId({
         }
     },
 
-    mutateAndGetPayload: ({publisherRegistrationId}, root) => {
-        return denyPublisherRegistration(publisherRegistrationId);
+    mutateAndGetPayload: ({publisherRegistrationId}, args, req) => {
+        let adminToken = (request.session.adminToken)? request.session.adminToken : null;
+
+        return denyPublisherRegistration(publisherRegistrationId, adminToken);
     }
 });
 

@@ -102,8 +102,8 @@ class PendingRegistrations extends React.Component {
   }
 
   pendingRegistrationsRowMapper(pendingPublisherRegistrations) {
-    if (!pendingPublisherRegistrations) {
-      return <p>No pending registrations</p>;
+    if (!pendingPublisherRegistrations || pendingPublisherRegistrations.length <= 0) {
+      return <tr><td colSpan="6" >No pending registrations</td></tr>
     }
 
     return pendingPublisherRegistrations.map(

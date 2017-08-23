@@ -45,8 +45,13 @@ function postToCloud(body, relativeURL) {
     });
 }
 
-function patchToCloud(body, relativeURL) {
-  return fetch(`${BASE_URL}${relativeURL}`, { method: 'PATCH', body: JSON.stringify(body) })
+function patchToCloud(body, relativeURL, adminToken) {
+  var headers = null;
+  if (adminToken) {
+    headers = buildAuthorizationApiHeader(adminToken)
+  }
+
+  return fetch(`${BASE_URL}${relativeURL}`, { method: 'PATCH', headers: headers, body: JSON.stringify(body) })
     .then(function(res) {
         return res.json();
     });
@@ -122,27 +127,27 @@ export function adminLogin(credentials) {
   return postToCloud(credentials, '/1/user/credentials');
 }
 
-export function fetchPendingRegistrations() {
-  return fetchResponseByURL(`/1/publisherRegistrations?statuses=PENDING`);
+export function fetchPendingRegistrations(adminToken) {
+  return fetchResponseByURLAndHeader(`/1/publisherRegistrations?statuses=PENDING`, buildAuthorizationApiHeader(adminToken));
 }
 
-export function fetchApprovedRegistrations() {
-  return fetchResponseByURL(`/1/publisherRegistrations?statuses=APPROVED`);
+export function fetchApprovedRegistrations(adminToken) {
+  return fetchResponseByURLAndHeader(`/1/publisherRegistrations?statuses=APPROVED`, buildAuthorizationApiHeader(adminToken));
 }
 
-export function fetchDeniedRegistrations() {
-  return fetchResponseByURL(`/1/publisherRegistrations?statuses=DENIED`);
+export function fetchDeniedRegistrations(adminToken) {
+  return fetchResponseByURLAndHeader(`/1/publisherRegistrations?statuses=DENIED`, buildAuthorizationApiHeader(adminToken));
 }
 
 export function fetchUsers(ids) {
   return fetchResponseByURL(`/1/users?ids=${ids}`);
 }
 
-export function denyPublisherRegistration(publisherRegistrationId) {
+export function denyPublisherRegistration(publisherRegistrationId, adminToken) {
   var body = {
     id: publisherRegistrationId,
     status: 'DENIED'
   };
 
-  return patchToCloud(body, `/1/publisherRegistration/${publisherRegistrationId}`);
+  return patchToCloud(body, `/1/publisherRegistration/${publisherRegistrationId}`, adminToken);
 }
