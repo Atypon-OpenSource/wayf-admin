@@ -75,7 +75,7 @@ class AdminApp extends React.Component {
           <div data-framework="relay">
             <Grid>
               {this.renderAdminAction()}
-              <AdminHeader createPublisher={this.showCreatePublisher} createAdmin={this.showCreateAdmin} />
+              <AdminHeader viewer={this.props.viewer} createPublisher={this.showCreatePublisher} createAdmin={this.showCreateAdmin} />
               <AdminTabs relay={this.props.relay} viewer={this.props.viewer}/>
             </Grid>
           </div>
@@ -95,10 +95,9 @@ export default createFragmentContainer(
   graphql`
     fragment AdminApp_viewer on viewer {
       me {
-        adminId: id,
-        firstName,
-        lastName
+        adminId: id
       }
+      ...AdminHeader_viewer,
       ...AdminTabs_viewer
     }
   `
