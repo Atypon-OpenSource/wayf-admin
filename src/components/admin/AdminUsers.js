@@ -11,6 +11,8 @@ import {
   Col,
   Button,
   Glyphicon,
+  Tooltip,
+  OverlayTrigger,
   Row} from 'react-bootstrap';
 
 
@@ -63,6 +65,14 @@ class AdminUsers extends React.Component {
       return <tr><td colSpan="6" >No administrative users</td></tr>
     }
 
+    const resetUserPasswordTooltip = (
+      <Tooltip id="tooltip">Reset user's password</Tooltip>
+    );
+
+    const deleteUserTooltip = (
+      <Tooltip id="tooltip">Delete user</Tooltip>
+    );
+
     return adminUsers.map(
         (adminUser, i) => {
           return (
@@ -80,9 +90,13 @@ class AdminUsers extends React.Component {
                 {moment(adminUser.createdDate).format('LLL')}
               </td>
               <td>
-                <Button bsStyle="warning"><Glyphicon glyph="random" /></Button>
+                <OverlayTrigger delayShow={300} delayHide={150} placement="left" overlay={resetUserPasswordTooltip}>
+                  <Button bsStyle="warning"><Glyphicon glyph="random" /></Button>
+                </OverlayTrigger>
                 &nbsp;
-                <Button bsStyle="danger"><Glyphicon glyph="remove" /></Button>
+                <OverlayTrigger delayShow={300} delayHide={150} placement="right" overlay={deleteUserTooltip}>
+                  <Button bsStyle="danger"><Glyphicon glyph="remove" /></Button>
+                </OverlayTrigger>
               </td>
             </tr>
           )
