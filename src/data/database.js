@@ -139,6 +139,10 @@ export function fetchDeniedRegistrations(adminToken) {
   return fetchResponseByURLAndHeader(`/1/publisherRegistrations?statuses=DENIED`, buildAuthorizationApiHeader(adminToken));
 }
 
+export function fetchAdminUsers(adminToken) {
+  return fetchResponseByURLAndHeader(`/1/users?view=ADMIN`, buildAuthorizationApiHeader(adminToken));
+}
+
 export function createUser(user, adminToken) {
   return postToCloud(user, `/1/user`, buildAuthorizationApiHeader(adminToken));
 }

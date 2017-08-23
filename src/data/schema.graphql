@@ -183,6 +183,7 @@ type UserType {
 type viewer {
   viewerId: String
   me: UserType
+  adminUsers: [UserType]
   device(globalId: String): DeviceType
   identityProvider(id: Int): IdentityProviderType
   publisher(id: String): PublisherType

@@ -43,7 +43,8 @@ import {
     getAdminViewer,
     denyPublisherRegistration,
     adminLogin,
-    createUser
+    createUser,
+    fetchAdminUsers
 } from './database';
 
 import {
@@ -323,6 +324,10 @@ const ViewerType = new GraphQLObjectType({
         me: {
             type: UserType,
             resolve: (root, args) => fetchMe(root.adminToken)
+        },
+        adminUsers: {
+            type: new GraphQLList(UserType),
+            resolve: (root, args) => fetchAdminUsers(root.adminToken)
         },
         device: {
             type: DeviceType,
