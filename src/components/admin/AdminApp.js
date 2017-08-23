@@ -18,15 +18,19 @@ import {
 } from 'react-bootstrap';
 
 import CreatePublisherModal from './CreatePublisherModal';
+import CreateUserModal from './CreateUserModal';
 
 class AdminApp extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      showCreatePublisherModal: false
+      showCreatePublisherModal: false,
+      showCreateAdminModal: false
     };
 
+    this.showCreateAdmin = this.showCreateAdmin.bind(this);
+    this.hideCreateAdminModal = this.hideCreateAdminModal.bind(this);
     this.showCreatePublisher = this.showCreatePublisher.bind(this);
     this.hideCreatePublisherModal = this.hideCreatePublisherModal.bind(this);
     this.renderAdminAction = this.renderAdminAction.bind(this);
@@ -39,15 +43,29 @@ class AdminApp extends React.Component {
     this.setState(state);
   }
 
+  showCreateAdmin() {
+    var state = this.state;
+    state.showCreateAdminModal = true;
+    this.setState(state);
+  }
+
   hideCreatePublisherModal() {
     var state = this.state;
     state.showCreatePublisherModal = false;
     this.setState(state);
   }
 
+  hideCreateAdminModal() {
+    var state = this.state;
+    state.showCreateAdminModal = false;
+    this.setState(state);
+  }
+
   renderAdminAction() {
     if (this.state.showCreatePublisherModal) {
       return <CreatePublisherModal relay={this.props.relay} onClose={this.hideCreatePublisherModal} />
+    } else if (this.state.showCreateAdminModal) {
+      return <CreateUserModal relay={this.props.relay} onClose={this.hideCreateAdminModal} />
     }
   }
 
@@ -57,7 +75,7 @@ class AdminApp extends React.Component {
           <div data-framework="relay">
             <Grid>
               {this.renderAdminAction()}
-              <AdminHeader createPublisher={this.showCreatePublisher} />
+              <AdminHeader createPublisher={this.showCreatePublisher} createAdmin={this.showCreateAdmin} />
               <AdminTabs relay={this.props.relay} viewer={this.props.viewer}/>
             </Grid>
           </div>

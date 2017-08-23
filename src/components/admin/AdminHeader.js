@@ -13,6 +13,7 @@ import PropTypes from 'prop-types';
 
 const propTypes = {
   createPublisher: PropTypes.func.isRequired,
+  createAdmin: PropTypes.func.isRequired
 };
 
 export default class AdminHeader extends React.Component {
@@ -28,8 +29,9 @@ export default class AdminHeader extends React.Component {
 		  <Col md={5} sm={5} />
 		  <Col md={1} sm={1}>
 		  	<DropdownButton  title="Available Actions" id="bg-nested-dropdown">
-			  <MenuItem eventKey="createPublisher" onClick={this.props.createPublisher}><Glyphicon glyph="plus" />&nbsp;Create Publisher</MenuItem>
-		    </DropdownButton>
+			    <MenuItem eventKey="createPublisher" onClick={this.props.createPublisher}><Glyphicon glyph="plus" />&nbsp;Create Publisher</MenuItem>
+		      <MenuItem eventKey="createAdmin" onClick={this.props.createAdmin}><Glyphicon glyph="plus" />&nbsp;Create Administrator</MenuItem>
+        </DropdownButton>
 		  </Col>
 		</Row>
 	  </Grid>

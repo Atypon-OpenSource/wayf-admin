@@ -45,6 +45,20 @@ type CreatePublisherRegistrationPayload {
   clientMutationId: String
 }
 
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  phoneNumber: String!
+  email: String!
+  password: String!
+  clientMutationId: String
+}
+
+type CreateUserPayload {
+  user: UserType
+  clientMutationId: String
+}
+
 # Date custom scalar type
 scalar Date
 
@@ -124,6 +138,7 @@ type Mutation {
   createPublisher(input: CreatePublisherInput!): CreatePublisherPayload
   denyPublisherRegistration(input: DenyPublisherRegistrationInput!): DenyPublisherRegistrationPayload
   adminLogin(input: AdminLoginInput!): AdminLoginPayload
+  createUser(input: CreateUserInput!): CreateUserPayload
 }
 
 type PublisherRegistrationType {

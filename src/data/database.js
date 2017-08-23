@@ -38,8 +38,8 @@ function fetchResponseByURL(relativeURL) {
   return fetch(`${BASE_URL}${relativeURL}`).then(res => res.json());
 }
 
-function postToCloud(body, relativeURL) {
-  return fetch(`${BASE_URL}${relativeURL}`, { method: 'POST', body: JSON.stringify(body) })
+function postToCloud(body, relativeURL, headers) {
+  return fetch(`${BASE_URL}${relativeURL}`, { method: 'POST', headers: headers, body: JSON.stringify(body) })
     .then(function(res) {
         return res.json();
     });
@@ -137,6 +137,10 @@ export function fetchApprovedRegistrations(adminToken) {
 
 export function fetchDeniedRegistrations(adminToken) {
   return fetchResponseByURLAndHeader(`/1/publisherRegistrations?statuses=DENIED`, buildAuthorizationApiHeader(adminToken));
+}
+
+export function createUser(user, adminToken) {
+  return postToCloud(user, `/1/user`, buildAuthorizationApiHeader(adminToken));
 }
 
 export function fetchUsers(ids) {

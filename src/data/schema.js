@@ -42,7 +42,8 @@ import {
     fetchDeniedRegistrations,
     getAdminViewer,
     denyPublisherRegistration,
-    adminLogin
+    adminLogin,
+    createUser
 } from './database';
 
 import {
@@ -471,6 +472,39 @@ const createPublisherRegistrationMutation = mutationWithClientMutationId({
     }
 });
 
+const createUserMutation = mutationWithClientMutationId({
+    name: 'CreateUser',
+    inputFields: {
+        firstName: { type: new GraphQLNonNull(GraphQLString) },
+        lastName: { type: new GraphQLNonNull(GraphQLString) },
+        phoneNumber: { type: new GraphQLNonNull(GraphQLString) },
+        email: { type: new GraphQLNonNull(GraphQLString) },
+        password: { type: new GraphQLNonNull(GraphQLString) }
+    },
+    outputFields: {
+        user: {
+            type: UserType,
+            resolve: (root, args) => root
+        },
+    },
+    mutateAndGetPayload: ({firstName, lastName, phoneNumber, email, password}, request, root) => {
+        var user = {
+            "firstName" : firstName,
+            "lastName" : lastName,
+            "email" : email,
+            "phoneNumber" : phoneNumber,
+            "credentials" : {
+                "emailAddress" : email,
+                "password" : password
+            }
+        };
+
+        let adminToken = request.session.adminToken;
+
+        return createUser(user, adminToken);
+    }
+});
+
 const createPublisherMutation = mutationWithClientMutationId({
     name: 'CreatePublisher',
     inputFields: {
@@ -514,7 +548,8 @@ const mutationType = new GraphQLObjectType({
         createPublisherRegistration: createPublisherRegistrationMutation,
         createPublisher: createPublisherMutation,
         denyPublisherRegistration: denyPublisherRegistrationMutation,
-        adminLogin: adminLoginMutation
+        adminLogin: adminLoginMutation,
+        createUser: createUserMutation
     })
 });
 
