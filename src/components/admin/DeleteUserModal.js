@@ -17,16 +17,18 @@ import {
 } from 'react-bootstrap';
 
 import Button from 'react-bootstrap-button-loader';
-import CreateUserMutation from '../../mutations/CreateUserMutation';
+import DeleteUserMutation from '../../mutations/DeleteUserMutation';
 import CreateUserForm from './CreateUserForm';
 import ConfirmationModal from './ConfirmationModal';
 
 const propTypes = {
   relay: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired
 };
 
-export default class CreateUserModal extends React.Component {
+export default class DeleteUserModal extends React.Component {
   constructor(props) {
     super(props);
 
@@ -34,64 +36,50 @@ export default class CreateUserModal extends React.Component {
     };
 
     this.submit = this.submit.bind(this);
-    this.validateInputs = this.validateInputs.bind(this);
     this.getFunctions = this.getFunctions.bind(this);
     this.getModalBodies = this.getModalBodies.bind(this);
     this.createConfirmationModal = this.createConfirmationModal.bind(this);
-    this.success = this.success.bind(this);
     this.buildSuccessBody = this.buildSuccessBody.bind(this);
     this.buildDefaultBody = this.buildDefaultBody.bind(this);
     this.close = this.close.bind(this);
   }
 
-  validateInputs() {
-    return this.createUserForm.validateInputs();
-  }
-
   submit(successFn, failureFn) {
-    CreateUserMutation.commit(
+    DeleteUserMutation.commit(
           this.props.relay.environment,
-          this.createUserForm.firstName.value,
-          this.createUserForm.lastName.value,
-          this.createUserForm.phoneNumber.value,
-          this.createUserForm.email.value,
-          this.createUserForm.password.value,
+          this.props.user.adminUserId,
           successFn
     );
   }
 
-  success(response) {
-    var state = this.state;
-    state.newUserName = response.createUser.user.firstName + ' ' + response.createUser.user.lastName;
-    this.setState(state);
+  close() {
+    this.props.onClose();
   }
 
-  close() {
-    var state = this.state;
-    state.newUserName = null;
-    this.setState(state);
-
-    this.props.onClose();
+  cancel() {
+    this.props.onCancel();
   }
 
   getFunctions() {
     var functions = {
       submit: this.submit,
-      validateInputs: this.validateInputs,
-      success: this.success,
       close: this.close,
-      cancel: this.close
+      cancel: this.cancel
     }
 
     return functions;
   }
 
+  getUserName() {
+    return this.props.user.firstName + ' ' + this.props.lastName;
+  }
+
   buildSuccessBody() {
-    return (<p>Success! A new administrator account has been created for {this.state.newUserName}.</p>);
+    return (<p>Success! The Administrator, <strong>{this.getUserName()}</strong>, has been deleted.</p>);
   }
 
   buildDefaultBody() {
-    return (<CreateUserForm ref={instance => {this.createUserForm = instance; }} />);
+    return (<p>Are you sure you want to delete Administrator <strong>{this.getUserName()}</strong>?</p>);
   }
 
   getModalBodies() {
@@ -106,7 +94,7 @@ export default class CreateUserModal extends React.Component {
   createConfirmationModal() {
     var bodies = this.getModalBodies();
     var functions = this.getFunctions();
-    return (<ConfirmationModal relay={this.props.relay} title="Create New Administrator" bodies={bodies} functions={functions} />);
+    return (<ConfirmationModal relay={this.props.relay} title="Delete Administrator" bodies={bodies} functions={functions} />);
   }
 
 
@@ -115,4 +103,4 @@ export default class CreateUserModal extends React.Component {
   }
 }
 
-CreateUserModal.propTypes = propTypes;
+DeleteUserModal.propTypes = propTypes;

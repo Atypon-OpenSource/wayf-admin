@@ -13,8 +13,10 @@ import {
   Glyphicon,
   Tooltip,
   OverlayTrigger,
-  Row} from 'react-bootstrap';
+  Row
+} from 'react-bootstrap';
 
+import DeleteUserModal from './DeleteUserModal'
 
 class AdminUsers extends React.Component {
   static propTypes = {
@@ -27,6 +29,9 @@ class AdminUsers extends React.Component {
 
     this.adminUsersRowMapper = this.adminUsersRowMapper.bind(this);
     this.refetch = this.refetch.bind(this);
+    this.clearDelete = this.clearDelete.bind(this);
+    this.clearDeleteAndRefetch = this.clearDeleteAndRefetch.bind(this);
+    this.renderUserAction = this.renderUserAction.bind(this);
 
     this.state = {
       publisherRegistrationToApprove: null,
@@ -58,6 +63,29 @@ class AdminUsers extends React.Component {
 
     this.fetchedAdminUsers= true;
     this.props.relay.refetch(refetchVariables, null);
+  }
+
+  clearDelete() {
+    var state = this.state;
+    state.userToDelete = null;
+    this.setState(state);
+  }
+
+  clearDeleteAndRefetch() {
+    this.clearDelete();
+    this.refetch();
+  }
+
+  selectUserForDeletion(user) {
+    var state = this.state;
+    state.userToDelete = user;
+    this.setState(state);
+  }
+
+  renderUserAction() {
+    if (this.state.userToDelete) {
+      return (<DeleteUserModal relay={this.props.relay} user={this.state.userToDelete} onClose={this.clearDeleteAndRefetch}  onCancel={this.clearDelete} />);
+    }
   }
 
   adminUsersRowMapper(adminUsers) {
@@ -95,7 +123,7 @@ class AdminUsers extends React.Component {
                 </OverlayTrigger>
                 &nbsp;
                 <OverlayTrigger delayShow={300} delayHide={150} placement="right" overlay={deleteUserTooltip}>
-                  <Button bsStyle="danger"><Glyphicon glyph="remove" /></Button>
+                  <Button bsStyle="danger" onClick={() => this.selectUserForDeletion(adminUser)}><Glyphicon glyph="remove" /></Button>
                 </OverlayTrigger>
               </td>
             </tr>
@@ -118,6 +146,7 @@ class AdminUsers extends React.Component {
             </tr>
           </thead>
           <tbody>
+            {this.renderUserAction()}
             {this.adminUsersRowMapper(this.props.viewer.adminUsers)}
           </tbody>
         </Table>

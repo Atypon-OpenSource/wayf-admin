@@ -86,7 +86,6 @@ export class IdpHistory extends React.Component {
   }
 
   clearForgetIdpRequestAndRefetch() {
-    console.log("clearing");
     this.clearForgetIdpRequest();
     this.refetch();
   }
