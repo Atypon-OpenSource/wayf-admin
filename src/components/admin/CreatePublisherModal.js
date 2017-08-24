@@ -99,6 +99,8 @@ export default class CreatePublisherModal extends React.Component {
     );
   }
 
+
+
   hideSuccessAlert() {
     var state = this.state;
     state.showSuccessAlert = false;

@@ -19,12 +19,11 @@ import {
 import Button from 'react-bootstrap-button-loader';
 import CreateUserMutation from '../../mutations/CreateUserMutation';
 import CreateUserForm from './CreateUserForm';
+import ConfirmationModal from './ConfirmationModal';
 
 const propTypes = {
   relay: PropTypes.object.isRequired,
-  onClose: PropTypes.func,
-  onSuccess: PropTypes.func,
-  publisherRegistration: PropTypes.object
+  onClose: PropTypes.func.isRequired
 };
 
 export default class CreateUserModal extends React.Component {
@@ -38,41 +37,22 @@ export default class CreateUserModal extends React.Component {
         successfulCreation: false
     };
 
-    this.hideSuccessAlert = this.hideSuccessAlert.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.successfulCreation = this.successfulCreation.bind(this);
-    this.getModalBody = this.getModalBody.bind(this);
-    this.getModalBottomPanel = this.getModalBottomPanel.bind(this);
-    this.hideModal = this.hideModal.bind(this);
-    this.confirm = this.confirm.bind(this);
+    this.submit = this.submit.bind(this);
+    this.validateInputs = this.validateInputs.bind(this);
+    this.getFunctions = this.getFunctions.bind(this);
+    this.getModalBodies = this.getModalBodies.bind(this);
+    this.createConfirmationModal = this.createConfirmationModal.bind(this);
+    this.success = this.success.bind(this);
+    this.buildSuccessBody = this.buildSuccessBody.bind(this);
+    this.buildDefaultBody = this.buildDefaultBody.bind(this);
+    this.close = this.close.bind(this);
   }
 
-  successfulCreation(mutationResponse) {
-    var state = this.state;
-    state.loading = false;
-    state.successfulCreation = true;
-    state.showSuccessAlert = true;
-
-    this.setState(state);
+  validateInputs() {
+    return this.createUserForm.validateInputs();
   }
 
-  confirm() {
-    this.hideModal();
-
-    if (this.props.onSuccess) {
-      this.props.onSuccess();
-    }
-  }
-
-  handleSubmit() {
-    var validInputs = this.createUserForm.validateInputs();
-
-    if (!validInputs) {
-      return;
-    }
-
-    this.setState({disableSubmit: true, loading: true});
-
+  submit(successFn, failureFn) {
     CreateUserMutation.commit(
           this.props.relay.environment,
           this.createUserForm.firstName.value,
@@ -80,77 +60,62 @@ export default class CreateUserModal extends React.Component {
           this.createUserForm.phoneNumber.value,
           this.createUserForm.email.value,
           this.createUserForm.password.value,
-          this.successfulCreation
+          successFn
     );
   }
 
-  hideSuccessAlert() {
+  success(response) {
     var state = this.state;
-    state.showSuccessAlert = false;
+    state.newUserName = response.createUser.user.firstName + ' ' + response.createUser.user.lastName;
     this.setState(state);
   }
 
-  getModalAlert() {
-    if (this.state.showSuccessAlert) {
-      return (<Alert bsStyle="success" onDismiss={this.hideSuccessAlert}>Success!</Alert>);
-    }
-  }
-
-  hideModal() {
+  close() {
     var state = this.state;
-    state.showModal = false;
-
+    state.newUserName = null;
     this.setState(state);
 
     this.props.onClose();
   }
 
-  getModalBody() {
-    if (this.state.successfulCreation) {
-      return (
-        <h3>Success</h3>
-      );
-    } else {
-      return (
-          <CreateUserForm ref={instance => {this.createUserForm = instance; }}  />
-        );
+  getFunctions() {
+    var functions = {
+      submit: this.submit,
+      validateInputs: this.validateInputs,
+      success: this.success,
+      close: this.close,
+      cancel: this.close
     }
+
+    return functions;
   }
 
-  getModalBottomPanel() {
-    if (this.state.successfulCreation) {
-      return (
-        <Button onClick={this.confirm}>Close</Button>
-      );
-    } else {
-      return (
-        <div>
-          <Button type="submit" loading={this.state.loading} spinColor='#000' onClick={this.handleSubmit}>
-            Submit
-          </Button>
-          <Button bsStyle="danger" onClick={this.hideModal}>
-            Cancel
-          </Button>
-        </div>    
-      );
-    }
+  buildSuccessBody() {
+    return (<p>Success! A new administrator account has been created for {this.state.newUserName}.</p>);
   }
+
+  buildDefaultBody() {
+    return (<CreateUserForm ref={instance => {this.createUserForm = instance; }} />);
+  }
+
+  getModalBodies() {
+    var bodies = {
+      success: this.buildSuccessBody,
+      default: this.buildDefaultBody
+    }; 
+
+    return bodies;
+  }
+
+  createConfirmationModal() {
+    var bodies = this.getModalBodies();
+    var functions = this.getFunctions();
+    return (<ConfirmationModal relay={this.props.relay} title="Create New Administrator" bodies={bodies} functions={functions} />);
+  }
+
 
   render() {
-    return (
-        <Modal show={this.state.showModal} dialogClassName="custom-modal">
-          <Modal.Header>
-            <Modal.Title id="contained-modal-title-lg">Create New Administrator</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {this.getModalAlert()}
-            {this.getModalBody()} 
-          </Modal.Body>
-          <Modal.Footer>
-            {this.getModalBottomPanel()}        
-          </Modal.Footer>
-        </Modal>
-    );
+    return this.createConfirmationModal();
   }
 }
 

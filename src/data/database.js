@@ -45,6 +45,10 @@ function postToCloud(body, relativeURL, headers) {
     });
 }
 
+function putToCloud(body, relativeURL, headers) {
+  return fetch(`${BASE_URL}${relativeURL}`, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+}
+
 function patchToCloud(body, relativeURL, adminToken) {
   var headers = null;
   if (adminToken) {
@@ -60,7 +64,7 @@ function patchToCloud(body, relativeURL, adminToken) {
 function deleteByURLAndHeader(relativeURL, header) {
   console.log(relativeURL, header);
 
-  return fetch(`${BASE_URL}${relativeURL}`, { headers: header, method: 'delete' }).then(res => res.json());
+  return fetch(`${BASE_URL}${relativeURL}`, { headers: header, method: 'delete' });
 }
 
 function fetchResponseByURLAndHeader(relativeURL, header) {
@@ -158,4 +162,12 @@ export function denyPublisherRegistration(publisherRegistrationId, adminToken) {
   };
 
   return patchToCloud(body, `/1/publisherRegistration/${publisherRegistrationId}`, adminToken);
+}
+
+export function deleteUser(userId, adminToken) {
+  return deleteByURLAndHeader(`/1/user/${userId}`, buildAuthorizationApiHeader(adminToken));
+}
+
+export function resetUserPassword(credentials, userId, adminToken) {
+  return putToCloud(credentials, `/1/user/${userId}/credentials`, buildAuthorizationApiHeader(adminToken));
 }

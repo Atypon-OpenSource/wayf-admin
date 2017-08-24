@@ -44,7 +44,9 @@ import {
     denyPublisherRegistration,
     adminLogin,
     createUser,
-    fetchAdminUsers
+    fetchAdminUsers,
+    deleteUser,
+    resetUserPassword
 } from './database';
 
 import {
@@ -403,6 +405,26 @@ const forgetIdpMutation = mutationWithClientMutationId({
     }
 });
 
+const deleteUserMutation = mutationWithClientMutationId({
+    name: 'DeleteUser',
+    inputFields: {
+        userId: { type: new GraphQLNonNull(GraphQLInt) }
+    },
+
+    outputFields: {
+        viewer: {
+            type: ViewerType
+        }
+    },
+
+    mutateAndGetPayload: ({userId}, request, root) => {
+        let adminToken = request.session.adminToken;
+
+        return deleteUser(userId, adminToken);
+    }
+});
+
+
 const denyPublisherRegistrationMutation = mutationWithClientMutationId({
     name: 'DenyPublisherRegistration',
     inputFields: {
@@ -510,6 +532,29 @@ const createUserMutation = mutationWithClientMutationId({
     }
 });
 
+const resetUserPasswordMutation = mutationWithClientMutationId({
+    name: 'ResetUserPassword',
+    inputFields: {
+        userId: { type: new GraphQLNonNull(GraphQLInt) },
+        password: { type: new GraphQLNonNull(GraphQLString) }
+    },
+    outputFields: {
+        viewer: {
+            type: ViewerType,
+            resolve: (root, args) => root
+        },
+    },
+    mutateAndGetPayload: ({userId, password}, request, root) => {
+        var credentials = {
+            "password" : password
+        };
+
+        let adminToken = request.session.adminToken;
+
+        return resetUserPassword(credentials, userId, adminToken);
+    }
+});
+
 const createPublisherMutation = mutationWithClientMutationId({
     name: 'CreatePublisher',
     inputFields: {
@@ -554,7 +599,9 @@ const mutationType = new GraphQLObjectType({
         createPublisher: createPublisherMutation,
         denyPublisherRegistration: denyPublisherRegistrationMutation,
         adminLogin: adminLoginMutation,
-        createUser: createUserMutation
+        createUser: createUserMutation,
+        deleteUser: deleteUserMutation,
+        resetUserPassword: resetUserPasswordMutation
     })
 });
 
