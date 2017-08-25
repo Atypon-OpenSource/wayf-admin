@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { 
-  createFragmentContainer, 
+  createRefetchContainer, 
   graphql 
 } from 'react-relay';
 
@@ -26,7 +26,8 @@ class AdminApp extends React.Component {
 
     this.state = {
       showCreatePublisherModal: false,
-      showCreateAdminModal: false
+      showCreateAdminModal: false,
+      loginCount: 0
     };
 
     this.showCreateAdmin = this.showCreateAdmin.bind(this);
@@ -35,6 +36,7 @@ class AdminApp extends React.Component {
     this.hideCreatePublisherModal = this.hideCreatePublisherModal.bind(this);
     this.renderAdminAction = this.renderAdminAction.bind(this);
     this.authorizationCheck = this.authorizationCheck.bind(this);
+    this.successfulLogin = this.successfulLogin.bind(this);
   }
 
   showCreatePublisher() {
@@ -61,6 +63,14 @@ class AdminApp extends React.Component {
     this.setState(state);
   }
 
+  successfulLogin() {
+    this.props.relay.refetch({}, null, null, { force: true });
+
+    var state = this.state;
+    state.loginCount = state.loginCount + 1;
+    this.setState(state);
+  }
+
   renderAdminAction() {
     if (this.state.showCreatePublisherModal) {
       return <CreatePublisherModal relay={this.props.relay} onClose={this.hideCreatePublisherModal} />
@@ -81,7 +91,7 @@ class AdminApp extends React.Component {
           </div>
         );
     } else {
-      return (<Login relay={this.props.relay} />);
+      return (<Login relay={this.props.relay} success={this.successfulLogin} />);
     }
   }
 
@@ -90,15 +100,23 @@ class AdminApp extends React.Component {
   }
 }
 
-export default createFragmentContainer(
-  AdminApp,
-  graphql`
-    fragment AdminApp_viewer on viewer {
-      me {
-        adminId: id
+
+export default createRefetchContainer(
+    AdminApp,
+    graphql`
+      fragment AdminApp_viewer on viewer {
+        me {
+          adminId: id
+        }
+        ...AdminHeader_viewer,
+        ...AdminTabs_viewer
       }
-      ...AdminHeader_viewer,
-      ...AdminTabs_viewer
-    }
-  `
+    `,
+    graphql`
+        query AdminAppRefetchQuery {
+          viewer {
+              ...AdminApp_viewer
+          }
+        }
+    `,
 );

@@ -22,6 +22,7 @@ import AdminLoginMutation from '../../mutations/AdminLoginMutation';
 
 const propTypes = {
   relay: PropTypes.object.isRequired,
+  success: PropTypes.func.isRequired
 };
 
 export default class Login extends React.Component {
@@ -89,6 +90,8 @@ export default class Login extends React.Component {
     state.successfulCreation = true;
 
     this.setState(state);
+
+    this.props.success();
   }
 
   render() {
