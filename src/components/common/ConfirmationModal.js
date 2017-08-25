@@ -2,7 +2,8 @@ import React from 'react';
 
 import { 
   Modal,
-  Alert
+  Alert,
+  Glyphicon
 } from 'react-bootstrap';
 
 import Button from 'react-bootstrap-button-loader';
@@ -95,9 +96,9 @@ export default class ConfirmationModal extends React.Component {
 
   getModalAlert() {
     if (this.state.status == 'SUCCESS') {
-      return (<Alert bsStyle="success">Success!</Alert>);
+      return (<Alert bsStyle="success"><Glyphicon glyph="ok" />&nbsp;Success!</Alert>);
     } else if (this.state.status == 'FAILURE') {
-      return (<Alert bsStyle="error">Failure!</Alert>);
+      return (<Alert bsStyle="error"><Glyphicon glyph="remove" />&nbsp;Failure!</Alert>);
     }
   }
 
