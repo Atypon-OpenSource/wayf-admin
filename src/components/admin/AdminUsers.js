@@ -16,6 +16,7 @@ import {
   Row
 } from 'react-bootstrap';
 
+import ResetUserPasswordModal from './ResetUserPasswordModal'
 import DeleteUserModal from './DeleteUserModal'
 
 class AdminUsers extends React.Component {
@@ -31,6 +32,8 @@ class AdminUsers extends React.Component {
     this.refetch = this.refetch.bind(this);
     this.clearDelete = this.clearDelete.bind(this);
     this.clearDeleteAndRefetch = this.clearDeleteAndRefetch.bind(this);
+    this.clearReset = this.clearReset.bind(this);
+    this.clearResetAndRefetch = this.clearResetAndRefetch.bind(this);
     this.renderUserAction = this.renderUserAction.bind(this);
 
     this.state = {
@@ -76,15 +79,34 @@ class AdminUsers extends React.Component {
     this.refetch();
   }
 
+  clearReset() {
+    var state = this.state;
+    state.userToReset = null;
+    this.setState(state);
+  }
+
+  clearResetAndRefetch() {
+    this.clearReset();
+    this.refetch();
+  }
+
   selectUserForDeletion(user) {
     var state = this.state;
     state.userToDelete = user;
     this.setState(state);
   }
 
+  selectUserForReset(user) {
+    var state = this.state;
+    state.userToReset = user;
+    this.setState(state);
+  }
+
   renderUserAction() {
     if (this.state.userToDelete) {
       return (<DeleteUserModal relay={this.props.relay} user={this.state.userToDelete} onClose={this.clearDeleteAndRefetch}  onCancel={this.clearDelete} />);
+    } else if (this.state.userToReset) {
+      return (<ResetUserPasswordModal relay={this.props.relay} user={this.state.userToReset} onClose={this.clearResetAndRefetch}  onCancel={this.clearReset} />);
     }
   }
 
@@ -119,7 +141,7 @@ class AdminUsers extends React.Component {
               </td>
               <td>
                 <OverlayTrigger delayShow={300} delayHide={150} placement="left" overlay={resetUserPasswordTooltip}>
-                  <Button bsStyle="warning"><Glyphicon glyph="random" /></Button>
+                  <Button bsStyle="warning" onClick={() => this.selectUserForReset(adminUser)}><Glyphicon glyph="random" /></Button>
                 </OverlayTrigger>
                 &nbsp;
                 <OverlayTrigger delayShow={300} delayHide={150} placement="right" overlay={deleteUserTooltip}>

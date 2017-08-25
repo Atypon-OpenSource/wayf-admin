@@ -21,7 +21,7 @@ function commit(
   const variables  = {
     input: {
       userId,
-      passwords
+      password
     }
   }
   commitMutation(

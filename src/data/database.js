@@ -45,8 +45,8 @@ function postToCloud(body, relativeURL, headers) {
     });
 }
 
-function putToCloud(body, relativeURL, headers) {
-  return fetch(`${BASE_URL}${relativeURL}`, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+function putToCloud(body, relativeURL, _headers) {
+  return fetch(`${BASE_URL}${relativeURL}`, { method: 'PUT', headers: _headers, body: JSON.stringify(body) });
 }
 
 function patchToCloud(body, relativeURL, adminToken) {

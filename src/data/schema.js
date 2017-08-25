@@ -550,7 +550,7 @@ const resetUserPasswordMutation = mutationWithClientMutationId({
         };
 
         let adminToken = request.session.adminToken;
-
+        
         return resetUserPassword(credentials, userId, adminToken);
     }
 });

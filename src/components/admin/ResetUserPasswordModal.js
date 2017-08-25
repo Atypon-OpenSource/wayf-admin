@@ -16,19 +16,17 @@ import {
   Alert
 } from 'react-bootstrap';
 
-import Button from 'react-bootstrap-button-loader';
-import DeleteUserMutation from '../../mutations/DeleteUserMutation';
-import CreateUserForm from './CreateUserForm';
+import ResetUserPasswordMutation from '../../mutations/ResetUserPasswordMutation';
+import ResetUserPasswordForm from './ResetUserPasswordForm';
 import ConfirmationModal from './ConfirmationModal';
 
 const propTypes = {
   relay: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired
 };
 
-export default class DeleteUserModal extends React.Component {
+export default class ResetUserPasswordModal extends React.Component {
   constructor(props) {
     super(props);
 
@@ -36,50 +34,58 @@ export default class DeleteUserModal extends React.Component {
     };
 
     this.submit = this.submit.bind(this);
+    this.validateInputs = this.validateInputs.bind(this);
     this.getFunctions = this.getFunctions.bind(this);
     this.getModalBodies = this.getModalBodies.bind(this);
     this.createConfirmationModal = this.createConfirmationModal.bind(this);
     this.buildSuccessBody = this.buildSuccessBody.bind(this);
     this.buildDefaultBody = this.buildDefaultBody.bind(this);
     this.close = this.close.bind(this);
+    this.buildUsername = this.buildUsername.bind(this);
+  }
+
+  validateInputs() {
+    return this.resetUserPasswordForm.validateInputs();
   }
 
   submit(successFn, failureFn) {
-    DeleteUserMutation.commit(
+    ResetUserPasswordMutation.commit(
           this.props.relay.environment,
           this.props.user.adminUserId,
+          this.resetUserPasswordForm.password.value,
           successFn
     );
   }
 
-  close() {
-    this.props.onClose();
+  buildUsername() {
+    return this.props.user.firstName + ' ' + this.props.user.lastName;
   }
 
-  cancel() {
-    this.props.onCancel();
+  close() {
+    var state = this.state;
+    state.newUserName = null;
+    this.setState(state);
+
+    this.props.onClose();
   }
 
   getFunctions() {
     var functions = {
       submit: this.submit,
+      validateInputs: this.validateInputs,
       close: this.close,
-      cancel: this.cancel
+      cancel: this.close
     }
 
     return functions;
   }
 
-  getUserName() {
-    return this.props.user.firstName + ' ' + this.props.user.lastName;
-  }
-
   buildSuccessBody() {
-    return (<p>Success! The Administrator, <strong>{this.getUserName()}</strong>, has been deleted.</p>);
+    return (<p>Success! The password has been reset for {this.buildUsername()}.</p>);
   }
 
   buildDefaultBody() {
-    return (<p>Are you sure you want to delete Administrator <strong>{this.getUserName()}</strong>?</p>);
+    return (<ResetUserPasswordForm ref={instance => {this.resetUserPasswordForm = instance; }} user={this.props.user} />);
   }
 
   getModalBodies() {
@@ -94,7 +100,7 @@ export default class DeleteUserModal extends React.Component {
   createConfirmationModal() {
     var bodies = this.getModalBodies();
     var functions = this.getFunctions();
-    return (<ConfirmationModal relay={this.props.relay} title="Delete Administrator" bodies={bodies} functions={functions} />);
+    return (<ConfirmationModal relay={this.props.relay} title="Reset Password" bodies={bodies} functions={functions} />);
   }
 
 
@@ -103,4 +109,4 @@ export default class DeleteUserModal extends React.Component {
   }
 }
 
-DeleteUserModal.propTypes = propTypes;
+ResetUserPasswordModal.propTypes = propTypes;
