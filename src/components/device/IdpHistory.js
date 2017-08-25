@@ -121,7 +121,7 @@ export class IdpHistory extends React.Component {
 
   generateForgetIdpModal() {
     if (this.state.identityProviderToForget) {
-      return (<ForgetIdpModal viewer={this.props.viewer} onForget={this.clearForgetIdpRequestAndRefetch} onClose={this.clearForgetIdpRequest} identityProvider={this.state.identityProviderToForget} relay={this.props.relay} />);
+      return (<ForgetIdpModal viewer={this.props.viewer} onClose={this.clearForgetIdpRequestAndRefetch} onCancel={this.clearForgetIdpRequest} identityProvider={this.state.identityProviderToForget} relay={this.props.relay} />);
     }
   }
 
