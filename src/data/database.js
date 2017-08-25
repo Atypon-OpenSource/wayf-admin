@@ -29,12 +29,10 @@ export function getAdminViewer() {
 }
 
 export function getViewer(deviceId, adminToken) {
-  console.log(`deviceId ${deviceId}`);
   return new User(deviceId, adminToken);
 }
 
 function fetchResponseByURL(relativeURL) {
-  console.log(`${BASE_URL}${relativeURL}`);
   return fetch(`${BASE_URL}${relativeURL}`).then(res => res.json());
 }
 
@@ -55,15 +53,10 @@ function patchToCloud(body, relativeURL, adminToken) {
     headers = buildAuthorizationApiHeader(adminToken)
   }
 
-  return fetch(`${BASE_URL}${relativeURL}`, { method: 'PATCH', headers: headers, body: JSON.stringify(body) })
-    .then(function(res) {
-        return res.json();
-    });
+  return fetch(`${BASE_URL}${relativeURL}`, { method: 'PATCH', headers: headers, body: JSON.stringify(body) });
 }
 
 function deleteByURLAndHeader(relativeURL, header) {
-  console.log(relativeURL, header);
-
   return fetch(`${BASE_URL}${relativeURL}`, { headers: header, method: 'delete' });
 }
 
@@ -123,8 +116,8 @@ export function createPublisherRegistration(publisherRegistration) {
   return postToCloud(publisherRegistration, '/1/publisherRegistration');
 }
 
-export function createPublisher(publisher) {
-  return postToCloud(publisher, '/1/publisher');
+export function createPublisher(publisher, adminToken) {
+  return postToCloud(publisher, '/1/publisher', buildAuthorizationApiHeader(adminToken));
 }
 
 export function adminLogin(credentials) {

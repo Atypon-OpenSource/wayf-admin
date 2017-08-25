@@ -19,7 +19,7 @@ import {
 import Button from 'react-bootstrap-button-loader';
 import CreateUserMutation from '../../mutations/CreateUserMutation';
 import CreateUserForm from './CreateUserForm';
-import ConfirmationModal from './ConfirmationModal';
+import ConfirmationModal from '../common/ConfirmationModal';
 
 const propTypes = {
   relay: PropTypes.object.isRequired,

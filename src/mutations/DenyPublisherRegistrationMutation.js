@@ -43,6 +43,7 @@ function commit(
         mutation,
         variables: variables,
         onCompleted: (response) => {
+          console.log(response);
           onComplete();
         },
         onError: err => console.error(err),

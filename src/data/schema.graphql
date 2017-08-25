@@ -172,7 +172,7 @@ type PublisherType {
   contact: UserType
   registration: PublisherRegistrationType
   widgetLocation: String
-  token: String
+  token: AuthorizationTokenType
   createdDate: Date
   modifiedDate: Date
 }

@@ -104,9 +104,9 @@ class AdminUsers extends React.Component {
 
   renderUserAction() {
     if (this.state.userToDelete) {
-      return (<DeleteUserModal relay={this.props.relay} user={this.state.userToDelete} onClose={this.clearDeleteAndRefetch}  onCancel={this.clearDelete} />);
+      return (<DeleteUserModal relay={this.props.relay} user={this.state.userToDelete} onClose={this.clearDeleteAndRefetch} onCancel={this.clearDelete} />);
     } else if (this.state.userToReset) {
-      return (<ResetUserPasswordModal relay={this.props.relay} user={this.state.userToReset} onClose={this.clearResetAndRefetch}  onCancel={this.clearReset} />);
+      return (<ResetUserPasswordModal relay={this.props.relay} user={this.state.userToReset} onClose={this.clearResetAndRefetch} onCancel={this.clearReset} />);
     }
   }
 

@@ -209,7 +209,7 @@ var PublisherType = new GraphQLObjectType({
             type: GraphQLString
         },
         token: {
-            type: GraphQLString
+            type: AuthorizationTokenType
         },
         createdDate: {
             type: DateType
@@ -437,8 +437,8 @@ const denyPublisherRegistrationMutation = mutationWithClientMutationId({
         }
     },
 
-    mutateAndGetPayload: ({publisherRegistrationId}, args, req) => {
-        let adminToken = (request.session.adminToken)? request.session.adminToken : null;
+    mutateAndGetPayload: ({publisherRegistrationId}, request, root) => {
+        let adminToken = request.session.adminToken;
 
         return denyPublisherRegistration(publisherRegistrationId, adminToken);
     }
@@ -550,7 +550,7 @@ const resetUserPasswordMutation = mutationWithClientMutationId({
         };
 
         let adminToken = request.session.adminToken;
-        
+
         return resetUserPassword(credentials, userId, adminToken);
     }
 });
@@ -572,7 +572,7 @@ const createPublisherMutation = mutationWithClientMutationId({
             resolve: (root, args) => root
         },
     },
-    mutateAndGetPayload: ({publisherName, publisherCode, registrationId, contactFirstName, contactLastName, contactPhoneNumber, contactEmail}, root) => {
+    mutateAndGetPayload: ({publisherName, publisherCode, registrationId, contactFirstName, contactLastName, contactPhoneNumber, contactEmail}, request, root) => {
         var publisher = {
             "name" : publisherName,
             "code" : publisherCode,
@@ -587,7 +587,9 @@ const createPublisherMutation = mutationWithClientMutationId({
             }
         };
 
-        return createPublisher(publisher);
+        let adminToken = request.session.adminToken;
+
+        return createPublisher(publisher, adminToken);
     }
 });
 

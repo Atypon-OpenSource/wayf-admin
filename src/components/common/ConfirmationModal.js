@@ -53,13 +53,13 @@ export default class ConfirmationModal extends React.Component {
   }
 
   handleSuccess(response) {
-    var state = this.state;
-    state.status = 'SUCCESS';
-    this.setState(state);
-
     if (this.props.functions.success) {
       this.props.functions.success(response);
     }
+
+    var state = this.state;
+    state.status = 'SUCCESS';
+    this.setState(state);
   }
 
   handleFailure(response) {

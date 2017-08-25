@@ -19,7 +19,7 @@ import {
 import Button from 'react-bootstrap-button-loader';
 import DeleteUserMutation from '../../mutations/DeleteUserMutation';
 import CreateUserForm from './CreateUserForm';
-import ConfirmationModal from './ConfirmationModal';
+import ConfirmationModal from '../common/ConfirmationModal';
 
 const propTypes = {
   relay: PropTypes.object.isRequired,
@@ -42,6 +42,7 @@ export default class DeleteUserModal extends React.Component {
     this.buildSuccessBody = this.buildSuccessBody.bind(this);
     this.buildDefaultBody = this.buildDefaultBody.bind(this);
     this.close = this.close.bind(this);
+    this.cancel = this.cancel.bind(this);
   }
 
   submit(successFn, failureFn) {

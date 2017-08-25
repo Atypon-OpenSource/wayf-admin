@@ -7,7 +7,9 @@ const mutation = graphql`
               name,
               code,
               widgetLocation,
-              token,
+              token {
+                value
+              }
               status
               contact {
                 firstName,

@@ -18,7 +18,7 @@ import {
 
 import ResetUserPasswordMutation from '../../mutations/ResetUserPasswordMutation';
 import ResetUserPasswordForm from './ResetUserPasswordForm';
-import ConfirmationModal from './ConfirmationModal';
+import ConfirmationModal from '../common/ConfirmationModal';
 
 const propTypes = {
   relay: PropTypes.object.isRequired,
