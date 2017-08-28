@@ -19,7 +19,8 @@ import {
     GraphQLScalarType,
     GraphQLString,
     GraphQLList,
-    GraphQLNonNull
+    GraphQLNonNull,
+    Er
 } from 'graphql';
 
 import {
@@ -454,7 +455,13 @@ const adminLoginMutation = mutationWithClientMutationId({
     outputFields: {
         token: {
             type: AuthorizationTokenType,
-            resolve: (root, args) => root
+            resolve: (res) => {
+                if (res.status != 200) { 
+                    throw new Error(res.status);
+                }
+
+                return res.json();
+            }
         }
     },
 

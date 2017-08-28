@@ -15,7 +15,8 @@ function commit(
     environment: Environment,
     email: string,
     password: string,
-    onComplete: func
+    onComplete: func,
+    onError: func
 ) {
   const variables  = {
     input: {
@@ -29,10 +30,8 @@ function commit(
       {
         mutation,
         variables: variables,
-        onCompleted: (response) => {
-          onComplete(response);
-        },
-        onError: err => console.error(err),
+        onCompleted: (response) => onComplete(response),
+        onError: (err) => onError(err),
       }
   );
 }

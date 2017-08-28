@@ -14,10 +14,12 @@ import {
   FormControl,
   HelpBlock,
   Modal,
-  Row
+  Row,
+  Alert,
+  Glyphicon,
 } from 'react-bootstrap';
 
-import Button from 'react-bootstrap-button-loader';
+ import Button from 'react-bootstrap-button-loader';
 import AdminLoginMutation from '../../mutations/AdminLoginMutation';
 
 const propTypes = {
@@ -32,11 +34,15 @@ export default class Login extends React.Component {
     this.state = {
         emailValidationState: null,
         passwordValidationState: null,
+        loading: false,
+        loginError: false
     };
 
     this.validateInputs = this.validateInputs.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.successfulCreation = this.successfulCreation.bind(this);
+    this.handleSuccess = this.handleSuccess.bind(this);
+    this.getAlert = this.getAlert.bind(this);
+    this.handleError = this.handleError.bind(this);
   }
 
   handleSubmit() {
@@ -52,7 +58,8 @@ export default class Login extends React.Component {
           this.props.relay.environment,
           this.email.value,
           this.password.value,
-          this.successfulCreation
+          this.handleSuccess,
+          this.handleError
     );
   }
 
@@ -80,18 +87,30 @@ export default class Login extends React.Component {
     return successfulValidation;
   }
 
-  successfulCreation(mutationResponse) {
+  handleSuccess(mutationResponse) {
     let token = mutationResponse.adminLogin.token.value;
 
     cookie.save('adminToken', token, { path: '/' });
 
     var state = this.state;
     state.loading = false;
-    state.successfulCreation = true;
-
+    state.loginError = false;
     this.setState(state);
 
     this.props.success();
+  }
+
+  handleError(error) {
+    var state = this.state;
+    state.loading = false;
+    state.loginError = true;
+    this.setState(state);
+  }
+
+  getAlert() {
+    if (this.state.loginError) {
+      return (<Alert bsStyle="danger"><Glyphicon glyph="remove" />&nbsp;Login Failure! Please check your credentials and try again.</Alert>);
+    }
   }
 
   render() {
@@ -100,6 +119,10 @@ export default class Login extends React.Component {
         <Row>
           <Col sm={3}></Col>
           <Col sm={6}><h3>Please Login</h3></Col>
+        </Row>
+        <Row>
+          <Col sm={3}></Col>
+          <Col sm={6}>{this.getAlert()}</Col>
         </Row>
         <Form horizontal>
           <FormGroup controlId="email" validationState={this.state.emailValidationState}>
@@ -123,7 +146,7 @@ export default class Login extends React.Component {
         <Row>
           <Col sm={3} />
           <Col sm={6}>
-            <Button type="submit" loading={this.state.loading} spinColor='#000' onClick={this.handleSubmit}>
+            <Button type="submit" loading={this.state.loading} spinColor='#000'  onClick={this.handleSubmit}>
               Submit
             </Button>
           </Col>

@@ -37,10 +37,7 @@ function fetchResponseByURL(relativeURL) {
 }
 
 function postToCloud(body, relativeURL, headers) {
-  return fetch(`${BASE_URL}${relativeURL}`, { method: 'POST', headers: headers, body: JSON.stringify(body) })
-    .then(function(res) {
-        return res.json();
-    });
+  return fetch(`${BASE_URL}${relativeURL}`, { method: 'POST', headers: headers, body: JSON.stringify(body) });
 }
 
 function putToCloud(body, relativeURL, _headers) {
