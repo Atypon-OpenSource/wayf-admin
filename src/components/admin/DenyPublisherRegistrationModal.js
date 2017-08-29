@@ -30,11 +30,11 @@ export default class DenyPublisherRegistrationModal extends React.Component {
   }
 
   submit(success, failure) {
-    console.log('submitting');
   	DenyPublisherRegistrationMutation.commit(
         this.props.relay.environment,
         this.props.publisherRegistration.publisherRegistrationId, 
-        success
+        success,
+        failure
     );
   }
 

@@ -34,7 +34,8 @@ export default class ForgetIdpModal extends React.Component {
     ForgetIdpMutation.commit(
         this.props.relay.environment,
         this.props.identityProvider.idpId,
-        success
+        success,
+        failure
     );
   }
 

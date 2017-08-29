@@ -56,7 +56,8 @@ export default class CreateUserModal extends React.Component {
           this.createUserForm.phoneNumber.value,
           this.createUserForm.email.value,
           this.createUserForm.password.value,
-          successFn
+          successFn,
+          failureFn
     );
   }
 
@@ -79,6 +80,7 @@ export default class CreateUserModal extends React.Component {
       submit: this.submit,
       validateInputs: this.validateInputs,
       success: this.success,
+      error: this.error,
       close: this.close,
       cancel: this.close
     }

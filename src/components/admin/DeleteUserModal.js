@@ -49,7 +49,8 @@ export default class DeleteUserModal extends React.Component {
     DeleteUserMutation.commit(
           this.props.relay.environment,
           this.props.user.adminUserId,
-          successFn
+          successFn,
+          failureFn
     );
   }
 

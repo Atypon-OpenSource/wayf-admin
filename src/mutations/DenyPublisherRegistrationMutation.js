@@ -29,7 +29,8 @@ function getConfigs(viewerId) {
 function commit(
     environment: Environment,
     publisherRegistrationId: number,
-    onComplete: func
+    onComplete: func,
+    onFailure: func
 ) {
   const variables  = {
     input: {
@@ -42,11 +43,8 @@ function commit(
       {
         mutation,
         variables: variables,
-        onCompleted: (response) => {
-          console.log(response);
-          onComplete();
-        },
-        onError: err => console.error(err),
+        onCompleted: (response) => onComplete(),
+        onError: (err) => onFailure(err),
       }
   );
 }

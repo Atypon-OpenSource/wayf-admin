@@ -98,14 +98,14 @@ export default class ConfirmationModal extends React.Component {
     if (this.state.status == 'SUCCESS') {
       return (<Alert bsStyle="success"><Glyphicon glyph="ok" />&nbsp;Success!</Alert>);
     } else if (this.state.status == 'FAILURE') {
-      return (<Alert bsStyle="error"><Glyphicon glyph="remove" />&nbsp;Failure!</Alert>);
+      return (<Alert bsStyle="danger"><Glyphicon glyph="remove" />&nbsp;The request failed to process. Please try again. If problem persists, please contact support.</Alert>);
     }
   }
 
   getModalBody() {
     if (this.state.status == 'SUCCESS') {
       return this.props.bodies.success();
-    } else if (this.state.status == 'FAILURE') {
+    } else if (this.state.status == 'FAILURE' && this.props.bodies.failure) {
       return this.props.bodies.failure();
     } else if (this.state.status == 'CLOSED') {
       return <p / >;

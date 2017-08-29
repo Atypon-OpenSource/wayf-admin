@@ -53,7 +53,8 @@ export default class ResetUserPasswordModal extends React.Component {
           this.props.relay.environment,
           this.props.user.adminUserId,
           this.resetUserPasswordForm.password.value,
-          successFn
+          successFn,
+          failureFn
     );
   }
 

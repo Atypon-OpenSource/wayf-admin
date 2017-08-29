@@ -19,7 +19,8 @@ function commit(
     phoneNumber: string,
     email: string,
     password: string,
-    onComplete: func
+    onComplete: func,
+    onFailure: func
 ) {
   const variables  = {
     input: {
@@ -39,7 +40,7 @@ function commit(
         onCompleted: (response) => {
           onComplete(response);
         },
-        onError: err => console.error(err),
+        onError: err => onFailure(err),
       }
   );
 }

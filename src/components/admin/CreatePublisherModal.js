@@ -80,7 +80,8 @@ export default class CreatePublisherModal extends React.Component {
           this.createPublisherForm.contactLastName.value,
           this.createPublisherForm.contactPhoneNumber.value,
           this.createPublisherForm.contactEmail.value,
-          success
+          success,
+          failure
     );
   }
 
