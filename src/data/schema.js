@@ -455,13 +455,7 @@ const adminLoginMutation = mutationWithClientMutationId({
     outputFields: {
         token: {
             type: AuthorizationTokenType,
-            resolve: (res) => {
-                if (res.status != 200) { 
-                    throw new Error(res.status);
-                }
-
-                return res.json();
-            }
+            resolve: (res) => res
         }
     },
 

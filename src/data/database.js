@@ -1,9 +1,15 @@
 import 'isomorphic-fetch';
 import DataLoader from 'dataloader';
-import config from '../../config';
 
-const BASE_URL = config.wayf.host + ':' + config.wayf.port;
-
+import {
+  wayfGet,
+  wayfPost, 
+  wayfPut,
+  wayfPatch,
+  wayfDelete,
+  buildDeviceCookieHeader,
+  buildAuthorizationApiHeader
+} from './WayfCloud';
 
 export var publisherLoader = new DataLoader(keys => fetchPublishers(keys));
 export var identityProviderLoader = new DataLoader(keys => fetchIdentityProviders(keys));
@@ -16,14 +22,6 @@ export class User {
   }
 }
 
-function buildDeviceCookieHeader(deviceId) {
-  return { Cookie: `deviceId=${deviceId}` };
-}
-
-function buildAuthorizationApiHeader(token) {
-  return { Authorization: `${token}` };
-}
-
 export function getAdminViewer() {
   return new User();
 }
@@ -32,68 +30,37 @@ export function getViewer(deviceId, adminToken) {
   return new User(deviceId, adminToken);
 }
 
-function fetchResponseByURL(relativeURL) {
-  return fetch(`${BASE_URL}${relativeURL}`).then(res => res.json());
-}
-
-function postToCloud(body, relativeURL, headers) {
-  return fetch(`${BASE_URL}${relativeURL}`, { method: 'POST', headers: headers, body: JSON.stringify(body) });
-}
-
-function putToCloud(body, relativeURL, _headers) {
-  return fetch(`${BASE_URL}${relativeURL}`, { method: 'PUT', headers: _headers, body: JSON.stringify(body) });
-}
-
-function patchToCloud(body, relativeURL, adminToken) {
-  var headers = null;
-  if (adminToken) {
-    headers = buildAuthorizationApiHeader(adminToken)
-  }
-
-  return fetch(`${BASE_URL}${relativeURL}`, { method: 'PATCH', headers: headers, body: JSON.stringify(body) });
-}
-
-function deleteByURLAndHeader(relativeURL, header) {
-  return fetch(`${BASE_URL}${relativeURL}`, { headers: header, method: 'delete' });
-}
-
-function fetchResponseByURLAndHeader(relativeURL, header) {
-  console.log(relativeURL, header);
-
-  return fetch(`${BASE_URL}${relativeURL}`, { headers: header }).then(res => res.json());
-}
-
 export function fetchMe(adminToken) {
-  return fetchResponseByURLAndHeader('/1/me', buildAuthorizationApiHeader(adminToken));
+  return wayfGet('/1/me', buildAuthorizationApiHeader(adminToken, null)).catch(err => { return {}; });
 }
 
 export function fetchDevice(deviceId) {
-  return fetchResponseByURLAndHeader('/1/mydevice', buildDeviceCookieHeader(deviceId));
+  return wayfGet('/1/mydevice', buildDeviceCookieHeader(deviceId, null));
 }
 
 export function fetchIdentityProvider(id) {
-  return fetchResponseByURL(`/1/identityProvider/${id}`);
+  return wayfGet(`/1/identityProvider/${id}`, null);
 }
 
 function fetchIdentityProviders(ids) {
-  return fetchResponseByURL(`/1/identityProviders?ids=${ids}`);
+  return wayfGet(`/1/identityProviders?ids=${ids}`, null);
 }
 
 
 export function fetchPublisher(id) {
-  return fetchResponseByURL(`/1/publisher/${id}`);
+  return wayfGet(`/1/publisher/${id}`, null);
 }
 
 function fetchPublishers(id) {
-  return fetchResponseByURL(`/1/publishers?ids=${id}`);
+  return wayfGet(`/1/publishers?ids=${id}`, null);
 }
 
 export function fetchActivity(deviceId) {
-  return fetchResponseByURLAndHeader('/1/mydevice/activity', buildDeviceCookieHeader(deviceId));
+  return wayfGet('/1/mydevice/activity', buildDeviceCookieHeader(deviceId, null));
 }
 
 export function fetchLatestActivity(deviceId) {
-  return fetchResponseByURLAndHeader('/1/mydevice/activity?limit=1&type=ADD_IDP', buildDeviceCookieHeader(deviceId))
+  return wayfGet('/1/mydevice/activity?limit=1&type=ADD_IDP', buildDeviceCookieHeader(deviceId, null))
       .then(function(res) {
         var activity = res;
 
@@ -102,47 +69,48 @@ export function fetchLatestActivity(deviceId) {
 }
 
 export function fetchHistory(deviceId) {
-  return fetchResponseByURLAndHeader('/1/mydevice/history', buildDeviceCookieHeader(deviceId));
+  return wayfGet('/1/mydevice/history', buildDeviceCookieHeader(deviceId, null));
 }
 
 export function forgetIdp(idpId, deviceId) {
-  return deleteByURLAndHeader(`/1/mydevice/history/idp/${idpId}`, buildDeviceCookieHeader(deviceId)).then(() => getViewer());
+  return wayfDelete(`/1/mydevice/history/idp/${idpId}`, buildDeviceCookieHeader(deviceId, null))
+    .then(() => getViewer());
 }
 
 export function createPublisherRegistration(publisherRegistration) {
-  return postToCloud(publisherRegistration, '/1/publisherRegistration');
+  return wayfPost('/1/publisherRegistration', publisherRegistration, null);
 }
 
 export function createPublisher(publisher, adminToken) {
-  return postToCloud(publisher, '/1/publisher', buildAuthorizationApiHeader(adminToken));
+  return wayfPost('/1/publisher', publisher, buildAuthorizationApiHeader(adminToken, null));
 }
 
 export function adminLogin(credentials) {
-  return postToCloud(credentials, '/1/user/credentials');
+  return wayfPost('/1/user/credentials', credentials, null);
 }
 
 export function fetchPendingRegistrations(adminToken) {
-  return fetchResponseByURLAndHeader(`/1/publisherRegistrations?statuses=PENDING`, buildAuthorizationApiHeader(adminToken));
+  return wayfGet(`/1/publisherRegistrations?statuses=PENDING`, buildAuthorizationApiHeader(adminToken, null));
 }
 
 export function fetchApprovedRegistrations(adminToken) {
-  return fetchResponseByURLAndHeader(`/1/publisherRegistrations?statuses=APPROVED`, buildAuthorizationApiHeader(adminToken));
+  return wayfGet(`/1/publisherRegistrations?statuses=APPROVED`, buildAuthorizationApiHeader(adminToken, null));
 }
 
 export function fetchDeniedRegistrations(adminToken) {
-  return fetchResponseByURLAndHeader(`/1/publisherRegistrations?statuses=DENIED`, buildAuthorizationApiHeader(adminToken));
+  return wayfGet(`/1/publisherRegistrations?statuses=DENIED`, buildAuthorizationApiHeader(adminToken, null));
 }
 
 export function fetchAdminUsers(adminToken) {
-  return fetchResponseByURLAndHeader(`/1/users?view=ADMIN`, buildAuthorizationApiHeader(adminToken));
+  return wayfGet(`/1/users?view=ADMIN`, buildAuthorizationApiHeader(adminToken, null));
 }
 
 export function createUser(user, adminToken) {
-  return postToCloud(user, `/1/user`, buildAuthorizationApiHeader(adminToken));
+  return wayfPost(`/1/user`, user, buildAuthorizationApiHeader(adminToken, null));
 }
 
 export function fetchUsers(ids) {
-  return fetchResponseByURL(`/1/users?ids=${ids}`);
+  return wayfGet(`/1/users?ids=${ids}`, null);
 }
 
 export function denyPublisherRegistration(publisherRegistrationId, adminToken) {
@@ -151,13 +119,13 @@ export function denyPublisherRegistration(publisherRegistrationId, adminToken) {
     status: 'DENIED'
   };
 
-  return patchToCloud(body, `/1/publisherRegistration/${publisherRegistrationId}`, adminToken);
+  return wayfPatch(`/1/publisherRegistration/${publisherRegistrationId}`, body, buildAuthorizationApiHeader(adminToken, null));
 }
 
 export function deleteUser(userId, adminToken) {
-  return deleteByURLAndHeader(`/1/user/${userId}`, buildAuthorizationApiHeader(adminToken));
+  return wayfDelete(`/1/user/${userId}`, buildAuthorizationApiHeader(adminToken, null));
 }
 
 export function resetUserPassword(credentials, userId, adminToken) {
-  return putToCloud(credentials, `/1/user/${userId}/credentials`, buildAuthorizationApiHeader(adminToken));
+  return wayfPut(`/1/user/${userId}/credentials`, credentials, buildAuthorizationApiHeader(adminToken, null));
 }
