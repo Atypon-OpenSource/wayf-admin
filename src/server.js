@@ -37,7 +37,16 @@ app.use(config.graphql.path, graphQLHTTP(request => {
     deviceId = request.headers.cookie;
   }
 
+  let adminToken = null;
+
+  if (request.cookies && request.cookies.adminToken) {
+    adminToken = "Token " + request.cookies.adminToken;
+  } else {
+    adminToken = request.headers.authorization;
+  }
+
   request.session.deviceId = deviceId;
+  request.session.adminToken = adminToken;
 
   return {
     schema: schema,
@@ -88,7 +97,13 @@ app.use(webpackMiddleware(webpack(webpackConfig), {
 app.use(async (req, res) => {
   var deviceId = req.cookies.deviceId;
 
-  const fetcher = new ServerFetcher(GRAPHQL_URL, deviceId);
+  var adminToken = null;
+
+  if (req.cookies.adminToken) {
+    adminToken = "Token " + req.cookies.adminToken;
+  }
+
+  const fetcher = new ServerFetcher(GRAPHQL_URL, deviceId, adminToken);
 
   const { redirect, status, element } = await getFarceResult({
     url: req.url,
@@ -110,11 +125,11 @@ app.use(async (req, res) => {
 <head>
   <meta charset="utf-8">
   <title>WAYF Cloud</title>
-  <link rel="stylesheet" href="styles.css">
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
 
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap-theme.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap-theme.min.css">
 </head>
 
 <body>
