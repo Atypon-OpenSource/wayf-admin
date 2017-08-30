@@ -98,7 +98,7 @@ export default class ConfirmationModal extends React.Component {
     if (this.state.status == 'SUCCESS') {
       return (<Alert bsStyle="success"><Glyphicon glyph="ok" />&nbsp;Success!</Alert>);
     } else if (this.state.status == 'FAILURE') {
-      return (<Alert bsStyle="danger"><Glyphicon glyph="remove" />&nbsp;The request failed to process. Please try again. If problem persists, please contact support.</Alert>);
+      return (<Alert bsStyle="danger"><Glyphicon glyph="remove" />&nbsp;The request failed to process. Please try again. If the problem persists, please contact support.</Alert>);
     }
   }
 

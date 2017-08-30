@@ -44,7 +44,9 @@ function executeRequest(httpMethod, relativeUrl, requestBody, headers) {
 				if (!response.ok) {
 					throw new Error(response.status);
 				}
-				return response.json();
+
+
+				return response.json().catch(err => { return {}; });
 			})
 }
 
@@ -57,7 +59,7 @@ export function wayfPost(relativeUrl, body, headers) {
 	return executeRequest(HTTP_METHODS.POST, relativeUrl, body, headers);
 }
 
-export function wayfPut(relativeUrl, headers) {
+export function wayfPut(relativeUrl, body, headers) {
 	return executeRequest(HTTP_METHODS.PUT, relativeUrl, body, headers);
 }
 
