@@ -28,8 +28,8 @@ app.use(session({
 
 
 app.use(express.static('public'));
-app.all('/1/*', proxy(config.wayf.host));   // main API path (temporary)
-app.all('/public/*', proxy(config.wayf.host)); // path where the widget.js is located
+app.all('/1/*', proxy(config.api.url));   // main API path (temporary)
+app.all('/public/*', proxy(config.api.url)); // path where the widget.js is located
 
 
 app.use(config.graphql.path, graphQLHTTP(request => {
