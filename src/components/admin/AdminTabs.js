@@ -8,6 +8,7 @@ import { Nav,
   TabContainer,
   TabContent, TabPane} from 'react-bootstrap';
 import PendingRegistrations from "./PendingRegistrations";
+import AdminUsers from "./AdminUsers";
 
 const propTypes = {
   viewer: PropTypes.object.isRequired,
@@ -23,15 +24,11 @@ class AdminTabs extends React.Component {
 
   handleSelect(eventKey) {
     if (eventKey === 'pending') {
-      this.idpHistoryComponent.refs.component.toggleShow();
+      this.pendingRegistrations.refs.component.toggleShow();
     }
 
-    if (eventKey === 'approved') {
-      this.deviceActivityComponent.refs.component.toggleShow();
-    }
-
-    if (eventKey === 'denied') {
-      this.deviceActivityComponent.refs.component.toggleShow();
+    if (eventKey === 'adminUsers') {
+      this.adminUsers.refs.component.toggleShow();
     }
   }
 
@@ -43,12 +40,16 @@ class AdminTabs extends React.Component {
             <Col md={12}>
               <Nav bsStyle="tabs" onSelect={this.handleSelect}>
                 <NavItem eventKey="pending">Pending Registrations</NavItem>
+                <NavItem eventKey="adminUsers">Admin Users</NavItem>
               </Nav>
             </Col>
 
             <TabContent>
               <TabPane eventKey="pending">
                 <PendingRegistrations relay={this.props.relay} viewer={this.props.viewer} ref={(pendingRegistrations) => { this.pendingRegistrations = pendingRegistrations; }}/>
+              </TabPane>
+              <TabPane eventKey="adminUsers">
+                <AdminUsers relay={this.props.relay} viewer={this.props.viewer} ref={(adminUsers) => { this.adminUsers = adminUsers; }}/>
               </TabPane>
             </TabContent>
           </Row>
@@ -63,7 +64,8 @@ export default createFragmentContainer(
     AdminTabs,
     graphql.experimental`
         fragment AdminTabs_viewer on viewer {
-            ...PendingRegistrations_viewer
+            ...PendingRegistrations_viewer,
+            ...AdminUsers_viewer
         },
     `,
 );

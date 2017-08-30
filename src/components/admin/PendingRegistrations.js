@@ -25,9 +25,10 @@ class PendingRegistrations extends React.Component {
 
     this.pendingRegistrationsRowMapper = this.pendingRegistrationsRowMapper.bind(this);
     this.approveClick = this.approveClick.bind(this);
-    this.cancelApproval = this.cancelApproval.bind(this);
+    this.clearApproval = this.clearApproval.bind(this);
     this.denyClick = this.denyClick.bind(this);
     this.clearDenyRequest = this.clearDenyRequest.bind(this);
+    this.clearDenyAndRefetch = this.clearDenyAndRefetch.bind(this);
     this.refetch = this.refetch.bind(this);
     this.clearApprovalAndRefetch = this.clearApprovalAndRefetch.bind(this);
 
@@ -77,7 +78,7 @@ class PendingRegistrations extends React.Component {
     this.setState(state);
   }
 
-  cancelApproval() {
+  clearApproval() {
     var state = this.state;
     state.publisherRegistrationToApprove = null;
 
@@ -85,7 +86,7 @@ class PendingRegistrations extends React.Component {
   }
 
   clearApprovalAndRefetch() {
-    this.cancelApproval();
+    this.clearApproval();
     this.refetch();
   }
 
@@ -94,16 +95,16 @@ class PendingRegistrations extends React.Component {
     state.publisherRegistrationToDeny = null;
 
     this.setState(state);
-    const refetchVariables = () => ({
-        fetchPendingRegistrations: true
-      });
+  }
 
-    this.props.relay.refetch(refetchVariables, null);
+  clearDenyAndRefetch() {
+    this.clearDenyRequest();
+    this.refetch();
   }
 
   pendingRegistrationsRowMapper(pendingPublisherRegistrations) {
-    if (!pendingPublisherRegistrations) {
-      return <p>No pending registrations</p>;
+    if (!pendingPublisherRegistrations || pendingPublisherRegistrations.length <= 0) {
+      return <tr><td colSpan="6" >No pending registrations</td></tr>
     }
 
     return pendingPublisherRegistrations.map(
@@ -139,9 +140,9 @@ class PendingRegistrations extends React.Component {
   render() {
     var actionModal;
     if (this.state.publisherRegistrationToApprove) {
-      actionModal = <CreatePublisherModal relay={this.props.relay} onClose={this.cancelApproval} onSuccess={this.clearApprovalAndRefetch} publisherRegistration={this.state.publisherRegistrationToApprove}/>;
+      actionModal = <CreatePublisherModal relay={this.props.relay} onClose={this.clearApprovalAndRefetch} onCancel={this.clearApproval} publisherRegistration={this.state.publisherRegistrationToApprove}/>;
     } else if (this.state.publisherRegistrationToDeny) {
-      actionModal = <DenyPublisherRegistrationModal relay={this.props.relay} onClose={this.clearDenyRequest} onDeny={this.clearDenyRequest} publisherRegistration={this.state.publisherRegistrationToDeny}/>;
+      actionModal = <DenyPublisherRegistrationModal relay={this.props.relay} onClose={this.clearDenyAndRefetch} onCancel={this.clearDenyRequest} publisherRegistration={this.state.publisherRegistrationToDeny}/>;
     } else {
       actionModal = <div></div>;
     }

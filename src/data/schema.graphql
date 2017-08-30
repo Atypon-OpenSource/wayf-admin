@@ -1,3 +1,20 @@
+input AdminLoginInput {
+  email: String!
+  password: String!
+  clientMutationId: String
+}
+
+type AdminLoginPayload {
+  token: AuthorizationTokenType
+  clientMutationId: String
+}
+
+type AuthorizationTokenType {
+  type: String
+  value: String
+  validUntil: Date
+}
+
 input CreatePublisherInput {
   publisherName: String!
   publisherCode: String!
@@ -28,8 +45,32 @@ type CreatePublisherRegistrationPayload {
   clientMutationId: String
 }
 
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  phoneNumber: String!
+  email: String!
+  password: String!
+  clientMutationId: String
+}
+
+type CreateUserPayload {
+  user: UserType
+  clientMutationId: String
+}
+
 # Date custom scalar type
 scalar Date
+
+input DeleteUserInput {
+  userId: Int!
+  clientMutationId: String
+}
+
+type DeleteUserPayload {
+  viewer: viewer
+  clientMutationId: String
+}
 
 input DenyPublisherRegistrationInput {
   publisherRegistrationId: Int!
@@ -106,6 +147,10 @@ type Mutation {
   createPublisherRegistration(input: CreatePublisherRegistrationInput!): CreatePublisherRegistrationPayload
   createPublisher(input: CreatePublisherInput!): CreatePublisherPayload
   denyPublisherRegistration(input: DenyPublisherRegistrationInput!): DenyPublisherRegistrationPayload
+  adminLogin(input: AdminLoginInput!): AdminLoginPayload
+  createUser(input: CreateUserInput!): CreateUserPayload
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload
+  resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload
 }
 
 type PublisherRegistrationType {
@@ -127,7 +172,7 @@ type PublisherType {
   contact: UserType
   registration: PublisherRegistrationType
   widgetLocation: String
-  token: String
+  token: AuthorizationTokenType
   createdDate: Date
   modifiedDate: Date
 }
@@ -135,6 +180,17 @@ type PublisherType {
 type Query {
   viewer: viewer
   publisherRegistration: PublisherRegistrationType
+}
+
+input ResetUserPasswordInput {
+  userId: Int!
+  password: String!
+  clientMutationId: String
+}
+
+type ResetUserPasswordPayload {
+  viewer: viewer
+  clientMutationId: String
 }
 
 type UserType {
@@ -149,6 +205,8 @@ type UserType {
 
 type viewer {
   viewerId: String
+  me: UserType
+  adminUsers: [UserType]
   device(globalId: String): DeviceType
   identityProvider(id: Int): IdentityProviderType
   publisher(id: String): PublisherType

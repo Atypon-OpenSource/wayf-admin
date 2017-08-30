@@ -7,10 +7,11 @@ import {
 
 import PropTypes from 'prop-types';
 import DenyPublisherRegistrationMutation from'../../mutations/DenyPublisherRegistrationMutation'
+import ConfirmationModal from '../common/ConfirmationModal';
 
 const propTypes = {
-  onDeny: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onClose:  PropTypes.func.isRequired,
   relay: PropTypes.object.isRequired,
   publisherRegistration: PropTypes.object.isRequired
 };
@@ -20,63 +21,58 @@ export default class DenyPublisherRegistrationModal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-    	disableActions: false,
-    	showModal: true
-    };
-
-    this.handleDenyRequest = this.handleDenyRequest.bind(this);
-    this.handleDenySuccess = this.handleDenySuccess.bind(this);
+    this.submit = this.submit.bind(this);
+    this.close = this.close.bind(this);
     this.cancel = this.cancel.bind(this);
+    this.getModalBodies = this.getModalBodies.bind(this);
+    this.getFunctions = this.getFunctions.bind(this);
+    this.createConfirmationModal = this.createConfirmationModal.bind(this);
   }
 
-  handleDenyRequest() {
-  	var state = this.state;
-  	state.disableActions = true;
-  	this.setState(state);
-
+  submit(success, failure) {
   	DenyPublisherRegistrationMutation.commit(
         this.props.relay.environment,
         this.props.publisherRegistration.publisherRegistrationId, 
-        this.handleDenySuccess
+        success,
+        failure
     );
-  }
-
-  handleDenySuccess() {
-  	var state = this.state;
-  	state.showModal = false;
-  	this.setState(state);
-
-  	this.props.onDeny();
   }
 
   cancel() {
-  	var state = this.state;
-  	state.showModal = false;
-  	this.setState(state);
+  	this.props.onCancel();
+  }
 
-  	this.props.onClose();
+  close() {
+    this.props.onClose();
+  }
+
+  getModalBodies() {
+    var bodies = {
+      default: () => { return (<p>Are you sure you want to reject the request for <b>{this.props.publisherRegistration.publisherName}</b>?</p>); },
+      success: () => { return (<p>Successfully rejected <b>{this.props.publisherRegistration.publisherName}</b>'s request.</p>); }
+    }
+
+    return bodies;
+  }
+
+  getFunctions() {
+    var functions = {
+      submit: this.submit,
+      close: this.close,
+      cancel: this.close
+    }
+
+    return functions;
+  }
+
+  createConfirmationModal() {
+    var bodies = this.getModalBodies();
+    var functions = this.getFunctions();
+    return (<ConfirmationModal relay={this.props.relay} title="Deny Registration Request" bodies={bodies} functions={functions} />);
   }
 
   render() {
-    return (
-	    <Modal show={this.state.showModal} dialogClassName="custom-modal">
-	      <Modal.Header>
-	        <Modal.Title id="contained-modal-title-lg">Deny Registration Request</Modal.Title>
-	      </Modal.Header>
-	      <Modal.Body>
-	        <p>Are you sure you want to reject the request for <b>{this.props.publisherRegistration.publisherName}</b>?</p>
-	      </Modal.Body>
-	      <Modal.Footer>
-	        <Button type="submit" bsStyle="danger" disabled={this.state.disableActions} onClick={this.handleDenyRequest}>
-	          Deny
-	        </Button>
-	        <Button disabled={this.state.disableActions} onClick={this.cancel}>
-	          Cancel
-	        </Button>          
-	      </Modal.Footer>
-	    </Modal>
-    );
+    return this.createConfirmationModal();
   }
 }
 

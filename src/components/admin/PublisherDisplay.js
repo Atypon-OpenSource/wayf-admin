@@ -46,7 +46,7 @@ export default class PublisherDisplay extends React.Component {
         </Row>
         <Row>
           <Col md={6} sm={6}><b>API Token</b></Col>
-          <Col md={6} sm={6}>{this.props.publisher.token}</Col>
+          <Col md={6} sm={6}>{this.props.publisher.token.value}</Col>
         </Row>
         <Row>
           <Col><h4>Contact Information</h4></Col>
