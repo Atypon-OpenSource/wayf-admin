@@ -11,6 +11,7 @@ import { ServerFetcher } from './fetcher';
 import { createResolver, historyMiddlewares, render, routeConfig } from './router';
 import schema from './data/schema';
 import cookieParser from 'cookie-parser';
+import proxy from 'express-http-proxy';
 import config from '../config';
 
 const PORT = config.express.port;
@@ -27,6 +28,9 @@ app.use(session({
 
 
 app.use(express.static('public'));
+app.all('/1/*', proxy(config.wayf.host));   // main API path (temporary)
+app.all('/public/*', proxy(config.wayf.host)); // path where the widget.js is located
+
 
 app.use(config.graphql.path, graphQLHTTP(request => {
   let deviceId = null;
