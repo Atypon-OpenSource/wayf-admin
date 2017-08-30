@@ -30,7 +30,13 @@ function commit(
       {
         mutation,
         variables: variables,
-        onCompleted: (response) => onComplete(response),
+        onCompleted: (response, errors) => {
+            if (errors && errors.length > 0) {
+              onError(errors);
+            } else {
+              onComplete(response);
+            }
+        },
         onError: (err) => onError(err),
       }
   );
