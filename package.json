@@ -6,9 +6,7 @@
     "start": "npm run relay-compiler && babel-node src/server",
     "update-schema": "babel-node tools/updateSchema.js"
   },
-  "devDependencies": {
-    "relay-compiler": "dev"
-  },
+  "devDependencies": {},
   "dependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.25.0",
@@ -31,6 +29,7 @@
     "eslint-plugin-react": "^6.10.3",
     "express": "^4.15.3",
     "express-graphql": "^0.6.6",
+    "express-http-proxy": "^1.0.6",
     "express-session": "^1.15.3",
     "extract-text-webpack-plugin": "^2.1.2",
     "farce": "^0.2.1",
