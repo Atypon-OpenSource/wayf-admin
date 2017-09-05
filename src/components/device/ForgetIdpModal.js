@@ -9,11 +9,12 @@ import Button from 'react-bootstrap-button-loader';
 
 import PropTypes from 'prop-types';
 import ForgetIdpMutation from '../../mutations/ForgetIdpMutation';
+import ConfirmationModal from '../common/ConfirmationModal';
 
 export default class ForgetIdpModal extends React.Component {
   static propTypes = {
-    onForget: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
     relay: PropTypes.object.isRequired,
     identityProvider: PropTypes.object.isRequired
   };
@@ -21,115 +22,58 @@ export default class ForgetIdpModal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-    	disableActions: false,
-    	showModal: true,
-      loading: false,
-      successfulForget: false,
-      showSuccessAlert: false
-    };
-
-    this.handleForgetRequest = this.handleForgetRequest.bind(this);
-    this.handleForgetSuccess = this.handleForgetSuccess.bind(this);
+    this.submit = this.submit.bind(this);
+    this.getFunctions = this.getFunctions.bind(this);
+    this.getModalBodies = this.getModalBodies.bind(this);
+    this.createConfirmationModal = this.createConfirmationModal.bind(this);
     this.close = this.close.bind(this);
-    this.getModalBody = this.getModalBody.bind(this);
-    this.hideSuccessModal = this.hideSuccessModal.bind(this);
-    this.getModalActions = this.getModalActions.bind(this);
+    this.cancel = this.close.bind(this);
   }
 
-  handleForgetRequest() {
-  	var state = this.state;
-  	state.loading = true;
-  	this.setState(state);
-
+  submit(success, failure) {
     ForgetIdpMutation.commit(
         this.props.relay.environment,
         this.props.identityProvider.idpId,
-        this.handleForgetSuccess
+        success,
+        failure
     );
-  }
-
-  handleForgetSuccess(response) {
-  	var state = this.state;
-    state.loading = false;
-    state.successfulForget = true;
-    state.showSuccessAlert = true;
-
-  	this.setState(state);
-  }
-
-  hideSuccessModal() {
-    var state = this.state;
-    state.showSuccessAlert = true;
-    this.setState(state);
-  }
-
-  getModalAlert() {
-    if (this.state.showSuccessAlert) {
-      return (<Alert bsStyle="success" onDismiss={this.hideSuccessModal}>Success!</Alert>);
-    }
-  }
-
-  getModalBody() {
-    if (this.state.successfulForget) {
-      return (<p>Successfully removed <b>{this.props.identityProvider.name}</b> from your login suggestions.</p>);
-    } else {
-      return (<p>Are you sure you want to remove <b>{this.props.identityProvider.name}</b> from your login suggestions?</p>);
-    }
-  }
-
-  getModalActions() {
-    if (this.state.successfulForget) {
-      return (<Button onClick={this.close}>Close</Button>);
-    } else {
-      return (
-        <div>
-          <Button loading={this.state.loading} spinColor='#000' onClick={this.handleForgetRequest}>
-            Confirm
-          </Button>
-          <Button bsStyle='danger' onClick={this.close}>
-            Cancel
-          </Button>
-        </div>
-      );
-    }
   }
 
   close() {
-    var successfulForget = this.state.successfulForget;
-  	var state = this.state;
-  	state.showModal = false;
-  	this.setState(state);
+    this.props.onClose();
+  }
 
-    if (successfulForget) {
-      this.props.onForget();
-    } else {
-      this.props.onClose();
+  cancel() {
+    this.props.onCancel();
+  }
+
+  getModalBodies() {
+    var bodies = {
+      default: () => { return (<p>Are you sure you want to remove <b>{this.props.identityProvider.name}</b> from your login suggestions?</p>); },
+      success: () => { return (<p>Successfully removed <b>{this.props.identityProvider.name}</b> from your login suggestions.</p>); }
     }
+
+    return bodies;
   }
 
-  confirm() {
-    var state = this.state;
-    state.showModal = false;
-    this.setState(state);
+  getFunctions() {
+    var functions = {
+      submit: this.submit,
+      close: this.close,
+      cancel: this.cancel
+    }
 
-    this.props.onForget();
+    return functions;
   }
+
+  createConfirmationModal() {
+    var bodies = this.getModalBodies();
+    var functions = this.getFunctions();
+    return (<ConfirmationModal relay={this.props.relay} title="Forget Identity Provider" bodies={bodies} functions={functions} />);
+  }
+
 
   render() {
-    return (
-	    <Modal show={this.state.showModal} dialogClassName="custom-modal">
-	      <Modal.Header>
-	        <Modal.Title id="contained-modal-title-lg">Forget Login Suggestion</Modal.Title>
-	      </Modal.Header>
-	      <Modal.Body>
-          {this.getModalAlert()}
-	        {this.getModalBody()}
-	      </Modal.Body>
-	      <Modal.Footer>
-          {this.getModalActions()}         
-	      </Modal.Footer>
-	    </Modal>
-    );
+    return this.createConfirmationModal();
   }
 }

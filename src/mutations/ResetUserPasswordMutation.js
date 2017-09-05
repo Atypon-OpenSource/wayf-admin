@@ -1,17 +1,11 @@
 import { graphql, commitMutation, Environment } from 'react-relay/compat';
 
 const mutation = graphql`
-    mutation ForgetIdpMutation($input: ForgetIdpInput!) {
-        forgetIdp(input: $input) {
+    mutation ResetUserPasswordMutation($input: ResetUserPasswordInput!) {
+        resetUserPassword(input: $input) {
             viewer {
-                history {
-                    key: idp {name},
-                    idp {
-                        id,
-                        name,
-                        type
-                    },
-                    lastActiveDate
+                me {
+                  adminId: id
                 }
             }
         }
@@ -20,13 +14,15 @@ const mutation = graphql`
 
 function commit(
     environment: Environment,
-    idpId: number,
+    userId: number,
+    password: string,
     onCompleted: func,
     onFailure: func
 ) {
   const variables  = {
     input: {
-      idpId
+      userId,
+      password
     }
   }
   commitMutation(

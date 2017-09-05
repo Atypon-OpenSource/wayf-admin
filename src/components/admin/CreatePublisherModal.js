@@ -20,11 +20,12 @@ import Button from 'react-bootstrap-button-loader';
 import CreatePublisherMutation from '../../mutations/CreatePublisherMutation';
 import CreatePublisherForm from './CreatePublisherForm';
 import PublisherDisplay from './PublisherDisplay';
+import ConfirmationModal from '../common/ConfirmationModal';
 
 const propTypes = {
   relay: PropTypes.object.isRequired,
-  onClose: PropTypes.func,
-  onSuccess: PropTypes.func,
+  onClose: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
   publisherRegistration: PropTypes.object
 };
 
@@ -33,55 +34,39 @@ export default class CreatePublisherModal extends React.Component {
     super(props);
 
     this.state = {
-        showModal: true,
-        loading: false,
-        showSuccessAlert: false,
-        successfulCreation: false,
-        publisherNameValidationState: null,
-        publisherCodeValidationState: null,
-        contactFirstNameValidationState: null,
-        contactLastNameValidationState: null,
-        contactPhoneValidationState: null,
-        contactEmailValidationState: null,
+      createdPublisher: null
     };
 
-    this.hideSuccessAlert = this.hideSuccessAlert.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.successfulCreation = this.successfulCreation.bind(this);
+    this.submit = this.submit.bind(this);
+    this.validateInputs = this.validateInputs.bind(this);
+    this.getFunctions = this.getFunctions.bind(this);
     this.getModalTitle = this.getModalTitle.bind(this);
-    this.getModalBody = this.getModalBody.bind(this);
-    this.getModalBottomPanel = this.getModalBottomPanel.bind(this);
-    this.hideModal = this.hideModal.bind(this);
-    this.confirm = this.confirm.bind(this);
+    this.getModalBodies = this.getModalBodies.bind(this);
+    this.createConfirmationModal = this.createConfirmationModal.bind(this);
+    this.success = this.success.bind(this);
+    this.close = this.close.bind(this);
+    this.cancel = this.close.bind(this);
   }
 
-  successfulCreation(mutationResponse) {
-    var state = this.state;
-    state.loading = false;
-    state.successfulCreation = true;
-    state.createdPublisher = mutationResponse.createPublisher.publisher;
-    state.showSuccessAlert = true;
+  validateInputs() {
+    return this.createPublisherForm.validateInputs();
+  }
 
+  success(response) {
+    var state = this.state;
+    state.createdPublisher = response.createPublisher.publisher;
     this.setState(state);
   }
 
-  confirm() {
-    this.hideModal();
-
-    if (this.props.onSuccess) {
-      this.props.onSuccess();
-    }
+  close() {
+    this.props.onClose();
   }
 
-  handleSubmit() {
-    var validInputs = this.createPublisherForm.validateInputs();
+  cancel() {
+    this.props.onCancel();
+  }
 
-    if (!validInputs) {
-      return;
-    }
-
-    this.setState({disableSubmit: true, loading: true});
-
+  submit(success, failure) {
     var publisherRegistrationId = 
       this.props.publisherRegistration? 
         this.props.publisherRegistration.publisherRegistrationId : null;
@@ -95,29 +80,9 @@ export default class CreatePublisherModal extends React.Component {
           this.createPublisherForm.contactLastName.value,
           this.createPublisherForm.contactPhoneNumber.value,
           this.createPublisherForm.contactEmail.value,
-          this.successfulCreation
+          success,
+          failure
     );
-  }
-
-  hideSuccessAlert() {
-    var state = this.state;
-    state.showSuccessAlert = false;
-    this.setState(state);
-  }
-
-  getModalAlert() {
-    if (this.state.showSuccessAlert) {
-      return (<Alert bsStyle="success" onDismiss={this.hideSuccessAlert}>Success!</Alert>);
-    }
-  }
-
-  hideModal() {
-    var state = this.state;
-    state.showModal = false;
-
-    this.setState(state);
-
-    this.props.onClose();
   }
 
   getModalTitle() {
@@ -128,52 +93,36 @@ export default class CreatePublisherModal extends React.Component {
     }
   }
 
-  getModalBody() {
-    if (this.state.successfulCreation) {
-      return (
-        <PublisherDisplay publisher={this.state.createdPublisher} />
-      );
-    } else {
-      return (
-          <CreatePublisherForm ref={instance => {this.createPublisherForm = instance; }} publisherRegistration={this.props.publisherRegistration} />
-        );
+  getModalBodies() {
+    var bodies = {
+      default: () => { return (<CreatePublisherForm ref={instance => {this.createPublisherForm = instance; }} publisherRegistration={this.props.publisherRegistration} />); },
+      success: () => { return (<PublisherDisplay publisher={this.state.createdPublisher} />); }
     }
+    
+    return bodies;
   }
 
-  getModalBottomPanel() {
-    if (this.state.successfulCreation) {
-      return (
-        <Button onClick={this.confirm}>Close</Button>
-      );
-    } else {
-      return (
-        <div>
-          <Button type="submit" loading={this.state.loading} spinColor='#000' onClick={this.handleSubmit}>
-            Submit
-          </Button>
-          <Button bsStyle="danger" onClick={this.hideModal}>
-            Cancel
-          </Button>
-        </div>    
-      );
+  getFunctions() {
+    var functions = {
+      submit: this.submit,
+      validateInputs: this.validateInputs,
+      success: this.success,
+      close: this.close,
+      cancel: this.close
     }
+
+    return functions;
   }
+
+  createConfirmationModal() {
+    var bodies = this.getModalBodies();
+    var functions = this.getFunctions();
+    return (<ConfirmationModal relay={this.props.relay} title={this.getModalTitle()} bodies={bodies} functions={functions} />);
+  }
+
 
   render() {
-    return (
-        <Modal show={this.state.showModal} dialogClassName="custom-modal">
-          <Modal.Header>
-            <Modal.Title id="contained-modal-title-lg">{this.getModalTitle()}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {this.getModalAlert()}
-            {this.getModalBody()} 
-          </Modal.Body>
-          <Modal.Footer>
-            {this.getModalBottomPanel()}        
-          </Modal.Footer>
-        </Modal>
-    );
+    return this.createConfirmationModal();
   }
 }
 

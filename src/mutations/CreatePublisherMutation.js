@@ -7,7 +7,9 @@ const mutation = graphql`
               name,
               code,
               widgetLocation,
-              token,
+              token {
+                value
+              }
               status
               contact {
                 firstName,
@@ -29,7 +31,8 @@ function commit(
     contactLastName: string,
     contactPhoneNumber: string,
     contactEmail: string,
-    onComplete: func
+    onComplete: func,
+    onFailure: func
 ) {
   const variables  = {
     input: {
@@ -48,10 +51,14 @@ function commit(
       {
         mutation,
         variables: variables,
-        onCompleted: (response) => {
-          onComplete(response);
+        onCompleted: (response, errors) => {
+            if (errors && errors.length > 0) {
+              onFailure(errors);
+            } else {
+              onComplete(response);
+            }
         },
-        onError: err => console.error(err),
+        onError: (err) => onFailure(err),
       }
   );
 }

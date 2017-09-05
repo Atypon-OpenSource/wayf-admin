@@ -11,6 +11,10 @@ var config = {
   wayf: {
     host: 'https://wayf-cloud-sandbox.literatumonline.com',
     port: 443
+  },
+
+  api: {
+    url: 'http://qa23.atypon.com:3307'
   }
 };
 
