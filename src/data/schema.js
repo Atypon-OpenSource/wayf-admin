@@ -29,6 +29,7 @@ import {
     fetchDevice,
     fetchIdentityProvider,
     fetchPublisher,
+    fetchAdminPublishers,
     fetchHistory,
     fetchLatestActivity,
     forgetIdp,
@@ -352,6 +353,10 @@ const ViewerType = new GraphQLObjectType({
                 id: {type: GraphQLString}
             },
             resolve: (root, args) => fetchPublisher(args.id)
+        },
+        adminPublishers: {
+            type: new GraphQLList(PublisherType),
+            resolve: (root, args) => fetchAdminPublishers(root.adminToken)
         },
         history: {
             type: new GraphQLList(IdentityProviderUsageType),

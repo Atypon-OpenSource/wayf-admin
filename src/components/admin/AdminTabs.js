@@ -9,6 +9,7 @@ import { Nav,
   TabContent, TabPane} from 'react-bootstrap';
 import PendingRegistrations from "./PendingRegistrations";
 import AdminUsers from "./AdminUsers";
+import AdminPublishers from "./AdminPublishers";
 
 const propTypes = {
   viewer: PropTypes.object.isRequired,
@@ -30,6 +31,9 @@ class AdminTabs extends React.Component {
     if (eventKey === 'adminUsers') {
       this.adminUsers.refs.component.toggleShow();
     }
+    if (eventKey === 'adminPublishers') {
+      this.adminPublishers.refs.component.toggleShow();
+    }
   }
 
   render() {
@@ -41,6 +45,7 @@ class AdminTabs extends React.Component {
               <Nav bsStyle="tabs" onSelect={this.handleSelect}>
                 <NavItem eventKey="pending">Pending Registrations</NavItem>
                 <NavItem eventKey="adminUsers">Admin Users</NavItem>
+                <NavItem eventKey="adminPublishers">Admin Publishers</NavItem>
               </Nav>
             </Col>
 
@@ -50,6 +55,9 @@ class AdminTabs extends React.Component {
               </TabPane>
               <TabPane eventKey="adminUsers">
                 <AdminUsers relay={this.props.relay} viewer={this.props.viewer} ref={(adminUsers) => { this.adminUsers = adminUsers; }}/>
+              </TabPane>
+              <TabPane eventKey="adminPublishers">
+                <AdminPublishers relay={this.props.relay} viewer={this.props.viewer} ref={(adminPublishers) => { this.adminPublishers = adminPublishers; }}/>
               </TabPane>
             </TabContent>
           </Row>
@@ -65,7 +73,8 @@ export default createFragmentContainer(
     graphql.experimental`
         fragment AdminTabs_viewer on viewer {
             ...PendingRegistrations_viewer,
-            ...AdminUsers_viewer
+            ...AdminUsers_viewer,
+            ...AdminPublishers_viewer
         },
     `,
 );

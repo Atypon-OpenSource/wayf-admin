@@ -55,6 +55,10 @@ function fetchPublishers(id) {
   return wayfGet(`/1/publishers?ids=${id}`, null);
 }
 
+export function fetchAdminPublishers(adminToken) {
+    return wayfGet('/1/publishers?view=ADMIN', buildAuthorizationApiHeader(adminToken, null));
+}
+
 export function fetchActivity(deviceId) {
   return wayfGet('/1/mydevice/activity', buildDeviceCookieHeader(deviceId, null));
 }
