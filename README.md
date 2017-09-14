@@ -27,3 +27,5 @@ the application where to load the wayf environment configuration from. If no val
 5. Run the relay compiler and load the newly generated schema file with `npm run relay-compiler --src src --schema src/data/schema.graphql`
 6. Start the server with `babel-node src/server`
 7. You may now verify that it started successfully by visiting localhost:3000. If the express port was overriden in the configuration, use that port.
+
+
