@@ -21,7 +21,7 @@ class AdminPublishers extends React.Component {
     }
 
     toggleShow() {
-        if (!this.fetchedHistory) {
+        if (!this.fetchedAdminPublishers) {
             const refetchVariables = () => ({
                 fetchAdminPublishers: true
             });
